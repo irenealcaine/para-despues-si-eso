@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useState } from "react"
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { AppFooter } from "../components/AppFooter"
 import { Button } from "../components/Button"
 import { Screen } from "../components/Screen"
@@ -60,18 +60,47 @@ export function SettingsScreen({ navigation }: Props) {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backPressed]}
+        >
+          <Text style={styles.backIcon}>←</Text>
+          <Text style={styles.backLabel}>Back</Text>
+        </Pressable>
         <Text style={styles.title}>Settings</Text>
+      </View>
 
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>OpenAI API key</Text>
-          <Text style={styles.status}>
-            {initializing
-              ? "Checking..."
-              : hasApiKey
-                ? `API key configured (${keyHint})`
-                : "No API key configured."}
-          </Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>OpenAI API key</Text>
+          </View>
+
+          <View style={styles.statusCard}>
+            <View style={styles.statusRow}>
+              <View
+                style={[
+                  styles.statusDot,
+                  initializing
+                    ? styles.dotPending
+                    : hasApiKey
+                      ? styles.dotActive
+                      : styles.dotInactive,
+                ]}
+              />
+              <Text style={styles.statusText}>
+                {initializing
+                  ? "Checking..."
+                  : hasApiKey
+                    ? "Configured"
+                    : "Not configured"}
+              </Text>
+            </View>
+            {hasApiKey && keyHint ? (
+              <Text style={styles.statusHint}>{keyHint}</Text>
+            ) : null}
+          </View>
 
           <TextField
             label="API key"
@@ -84,19 +113,18 @@ export function SettingsScreen({ navigation }: Props) {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <Button title="Save API key" onPress={handleSaveKey} loading={saving} />
-
-          {hasApiKey ? (
-            <View style={styles.spacer} />
-          ) : null}
-
-          {hasApiKey ? (
-            <Button title="Delete API key" onPress={handleDeleteKey} variant="danger" />
-          ) : null}
+          <View style={styles.row}>
+            <Button title="Save key" onPress={handleSaveKey} loading={saving} compact />
+            {hasApiKey ? (
+              <Button title="Delete key" onPress={handleDeleteKey} variant="danger" compact />
+            ) : null}
+          </View>
         </View>
 
+        <View style={styles.divider} />
+
         <View style={styles.section}>
-          <Button title="Log out" onPress={handleLogout} variant="danger" />
+          <Button title="Log out" onPress={handleLogout} variant="danger" compact />
         </View>
 
         <AppFooter />
@@ -106,35 +134,108 @@ export function SettingsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 24,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    gap: 12,
+  },
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  backPressed: {
+    backgroundColor: colors.surfaceAlt,
+  },
+  backIcon: {
+    color: colors.accent,
+    fontSize: 16,
+    fontFamily: "monospace",
+    fontWeight: "700",
+  },
+  backLabel: {
+    color: colors.accent,
+    fontSize: 14,
+    fontWeight: "500",
   },
   title: {
     color: colors.text,
-    fontSize: 26,
+    fontSize: 16,
     fontWeight: "700",
-    marginBottom: 24,
+  },
+  container: {
+    padding: 16,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  sectionHeader: {
+    marginBottom: 10,
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  status: {
-    color: colors.textMuted,
     fontSize: 14,
-    marginBottom: 16,
+    fontWeight: "600",
+  },
+  statusCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 14,
+    gap: 4,
+  },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  dotActive: {
+    backgroundColor: colors.success,
+  },
+  dotInactive: {
+    backgroundColor: colors.danger,
+  },
+  dotPending: {
+    backgroundColor: colors.warning,
+  },
+  statusText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  statusHint: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontFamily: "monospace",
+    marginLeft: 16,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 8,
   },
   error: {
     color: colors.danger,
-    fontSize: 14,
-    marginBottom: 12,
+    fontSize: 13,
+    marginBottom: 8,
   },
-  spacer: {
-    height: 12,
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginBottom: 16,
   },
 })

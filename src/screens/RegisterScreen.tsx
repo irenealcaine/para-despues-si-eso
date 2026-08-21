@@ -50,7 +50,9 @@ export function RegisterScreen({ navigation }: Props) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>Create account</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>Create account</Text>
+          </View>
 
           <View style={styles.form}>
             <TextField
@@ -82,7 +84,11 @@ export function RegisterScreen({ navigation }: Props) {
             <Button title="Register" onPress={handleRegister} loading={loading} />
           </View>
 
-          <Button title="I already have an account" onPress={() => navigation.navigate("Login")} variant="secondary" />
+          <Button
+            title="I already have an account"
+            onPress={() => navigation.navigate("Login")}
+            variant="secondary"
+          />
         </View>
       </KeyboardAvoidingView>
     </Screen>
@@ -99,19 +105,20 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 24,
   },
+  header: {
+    gap: 4,
+  },
   title: {
     color: colors.text,
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: "700",
-    textAlign: "center",
   },
   form: {
-    gap: 8,
+    gap: 4,
   },
   error: {
     color: colors.danger,
-    fontSize: 14,
-    textAlign: "center",
+    fontSize: 13,
     marginBottom: 8,
   },
 })

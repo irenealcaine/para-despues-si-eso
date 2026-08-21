@@ -44,8 +44,10 @@ export function LoginScreen({ navigation }: Props) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>Para después</Text>
-          <Text style={styles.subtitle}>Save links to read later</Text>
+          <View style={styles.header}>
+            <Text style={styles.title}>para-despues</Text>
+            <Text style={styles.subtitle}>Save links to read later</Text>
+          </View>
 
           <View style={styles.form}>
             <TextField
@@ -90,24 +92,26 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 24,
   },
+  header: {
+    gap: 4,
+  },
   title: {
     color: colors.text,
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: "700",
-    textAlign: "center",
+    fontFamily: "monospace",
+    letterSpacing: -0.3,
   },
   subtitle: {
     color: colors.textMuted,
-    fontSize: 16,
-    textAlign: "center",
+    fontSize: 14,
   },
   form: {
-    gap: 8,
+    gap: 4,
   },
   error: {
     color: colors.danger,
-    fontSize: 14,
-    textAlign: "center",
+    fontSize: 13,
     marginBottom: 8,
   },
 })

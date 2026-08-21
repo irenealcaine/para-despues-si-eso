@@ -1,90 +1,162 @@
-import { StyleSheet, Text, View } from "react-native"
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native"
 import { colors } from "../constants/colors"
 import type { SavedLink } from "../types/link"
 import { formatTimestamp } from "../utils/date"
 
 const PLATFORM_LABELS: Record<SavedLink["platform"], string> = {
-  youtube: "YouTube",
-  instagram: "Instagram",
-  other: "Other",
+  youtube: "YT",
+  instagram: "IG",
+  other: "WEB",
 }
 
-const TYPE_LABELS: Record<SavedLink["type"], string> = {
-  video: "Video",
-  webpage: "Webpage",
-  unknown: "Unknown",
+type Props = {
+  link: SavedLink
+  onDelete: (linkId: string) => void
 }
 
-export function LinkCard({ link }: { link: SavedLink }) {
+export function LinkCard({ link, onDelete }: Props) {
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={2}>
-          {link.title}
-        </Text>
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryText}>{link.category}</Text>
+      <View style={styles.leftAccent} />
+      <View style={styles.content}>
+        <View style={styles.topRow}>
+          <Text style={styles.title} numberOfLines={2}>
+            {link.title}
+          </Text>
+        </View>
+
+        <View style={styles.bottomRow}>
+          <View style={styles.metaRow}>
+            <Text style={styles.platform}>{PLATFORM_LABELS[link.platform]}</Text>
+            <Text style={styles.dot}>·</Text>
+            <Text style={styles.category}>{link.category}</Text>
+            <Text style={styles.dot}>·</Text>
+            <Text style={styles.date}>{formatTimestamp(link.createdAt)}</Text>
+          </View>
+
+          <View style={styles.actions}>
+            <Pressable
+              onPress={() => Linking.openURL(link.url)}
+              style={({ pressed }) => [
+                styles.iconBtn,
+                pressed && styles.pressed,
+              ]}
+              accessibilityLabel="Open link"
+            >
+              <Text style={styles.iconOpen}>↗</Text>
+            </Pressable>
+            <View style={styles.separator} />
+            <Pressable
+              onPress={() => onDelete(link.id)}
+              style={({ pressed }) => [
+                styles.iconBtn,
+                pressed && styles.pressed,
+              ]}
+              accessibilityLabel="Delete link"
+            >
+              <Text style={styles.iconDelete}>×</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-
-      <View style={styles.metaRow}>
-        <Text style={styles.meta}>
-          {PLATFORM_LABELS[link.platform]} · {TYPE_LABELS[link.type]}
-        </Text>
-        <Text style={styles.meta}>{formatTimestamp(link.createdAt)}</Text>
-      </View>
-
-      <Text style={styles.url} numberOfLines={1}>
-        {link.url}
-      </Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-  },
-  header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    backgroundColor: colors.surface,
+    marginBottom: 1,
+    minHeight: 52,
+  },
+  leftAccent: {
+    width: 2,
+    backgroundColor: colors.border,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 6,
+  },
+  topRow: {
+    flexDirection: "row",
     alignItems: "flex-start",
-    gap: 12,
+    gap: 8,
   },
   title: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "600",
     flex: 1,
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "600",
+    lineHeight: 20,
   },
-  categoryBadge: {
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  categoryText: {
-    color: colors.text,
-    fontSize: 12,
-    fontWeight: "600",
+  bottomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   metaRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+    alignItems: "center",
+    gap: 5,
+    flex: 1,
   },
-  meta: {
-    color: colors.textMuted,
+  platform: {
+    color: colors.accent,
     fontSize: 12,
+    fontWeight: "600",
+    fontFamily: "monospace",
+    letterSpacing: 0.5,
   },
-  url: {
+  category: {
     color: colors.textMuted,
-    fontSize: 13,
-    marginTop: 8,
+    fontSize: 11,
+    fontFamily: "monospace",
+  },
+  date: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontFamily: "monospace",
+  },
+  dot: {
+    color: colors.border,
+    fontSize: 11,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 0,
+    marginLeft: 8,
+  },
+  iconBtn: {
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 6,
+  },
+  pressed: {
+    backgroundColor: colors.surfaceAlt,
+  },
+  iconOpen: {
+    color: colors.textMuted,
+    fontSize: 18,
+    fontFamily: "monospace",
+    fontWeight: "700",
+  },
+  iconDelete: {
+    color: colors.danger,
+    fontSize: 22,
+    fontFamily: "monospace",
+    fontWeight: "700",
+    marginTop: -1,
+  },
+  separator: {
+    width: 1,
+    height: 18,
+    backgroundColor: colors.border,
+    marginHorizontal: 4,
   },
 })

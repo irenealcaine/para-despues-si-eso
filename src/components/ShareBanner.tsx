@@ -23,27 +23,41 @@ export function ShareBanner({
 }: ShareBannerProps) {
   const insets = useSafeAreaInsets()
   const bannerColor =
-    type === "error" ? colors.danger : type === "success" ? colors.success : colors.primary
+    type === "error" ? colors.danger : type === "success" ? colors.success : colors.accent
 
   return (
     <View
       style={[
         styles.overlay,
-        { paddingTop: insets.top + 12, borderTopColor: bannerColor },
+        { paddingTop: insets.top + 8, borderTopColor: bannerColor },
       ]}
     >
       <View style={styles.content}>
-        {processing ? <ActivityIndicator color={colors.primary} /> : null}
-        <Text style={styles.message}>{message}</Text>
+        <View style={styles.row}>
+          {processing ? (
+            <ActivityIndicator color={colors.accent} size="small" />
+          ) : null}
+          <Text style={styles.message}>{message}</Text>
+        </View>
         <View style={styles.actions}>
           {onSettingsPress ? (
-            <Button title="Ajustes" onPress={onSettingsPress} variant="secondary" />
+            <Button
+              title="Settings"
+              onPress={onSettingsPress}
+              variant="secondary"
+              compact
+            />
           ) : null}
           {onRetryPress && !processing ? (
-            <Button title="Reintentar" onPress={onRetryPress} variant="secondary" />
+            <Button
+              title="Retry"
+              onPress={onRetryPress}
+              variant="secondary"
+              compact
+            />
           ) : null}
           {!processing ? (
-            <Button title="Cerrar" onPress={onDismiss} variant="secondary" />
+            <Button title="Close" onPress={onDismiss} variant="ghost" compact />
           ) : null}
         </View>
       </View>
@@ -58,28 +72,27 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     backgroundColor: colors.surface,
-    borderTopWidth: 3,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    borderTopWidth: 2,
+    paddingHorizontal: 12,
+    paddingBottom: 10,
     zIndex: 10,
   },
   content: {
+    gap: 8,
+  },
+  row: {
+    flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
   },
   message: {
     color: colors.text,
-    fontSize: 14,
-    textAlign: "center",
+    fontSize: 12,
+    flex: 1,
   },
   actions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
     flexWrap: "wrap",
-    justifyContent: "center",
   },
 })

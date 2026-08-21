@@ -24,13 +24,13 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: "700",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   body: {
     color: colors.textMuted,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 20,
   },
 })

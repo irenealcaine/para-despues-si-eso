@@ -1,6 +1,8 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
@@ -57,4 +59,8 @@ export async function addLink(input: LinkInput): Promise<void> {
     category: input.category,
     createdAt: serverTimestamp() as Timestamp,
   })
+}
+
+export async function deleteLink(linkId: string): Promise<void> {
+  await deleteDoc(doc(getDb(), "links", linkId))
 }

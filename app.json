@@ -14,7 +14,7 @@
     "android": {
       "package": "com.irenealcaine.paradespues",
       "adaptiveIcon": {
-        "backgroundColor": "#0B0F14",
+        "backgroundColor": "#090B0E",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -31,7 +31,7 @@
         {
           "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#0B0F14"
+          "backgroundColor": "#090B0E"
         }
       ],
       "expo-dev-client",

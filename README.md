@@ -178,14 +178,19 @@ The APK is generated at `android/app/build/outputs/apk/release/app-release.apk`.
 
 ### EAS Build (cloud)
 
+Because `.env` is gitignored, the Firebase config must also be available to the cloud build. Create the same variables on EAS (they replace the local `.env` at build time):
+
 ```bash
-npm install -g eas-cli   # or: pnpm add -D eas-cli
+pnpm add -D eas-cli
 eas login
-eas build:configure
+eas init                      # links the project and writes extra.eas.projectId
+eas env:set --name EXPO_PUBLIC_FIREBASE_API_KEY --value <value> \
+  --environment preview production development --non-interactive
+# ...repeat for the other 6 EXPO_PUBLIC_FIREBASE_* variables
 eas build --platform android --profile preview
 ```
 
-`preview` builds an installable APK. For Play Store you would use `--profile production` (AAB). EAS Build does not require a local Android SDK.
+`preview` builds an installable APK (`eas.json` sets `android.buildType: "apk"`). For Play Store you would use `--profile production` (AAB). EAS Build does not require a local Android SDK.
 
 ## Project structure
 

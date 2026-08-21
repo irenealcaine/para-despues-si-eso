@@ -1,5 +1,13 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native"
+import { useCallback, useMemo } from "react"
+import {
+  ActivityIndicator,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+} from "react-native"
 import { AppFooter } from "../components/AppFooter"
 import { Button } from "../components/Button"
 import { EmptyState } from "../components/EmptyState"
@@ -8,77 +16,159 @@ import { Screen } from "../components/Screen"
 import { colors } from "../constants/colors"
 import { useAuth } from "../hooks/useAuth"
 import { useSavedLinks } from "../hooks/useSavedLinks"
+import { deleteLink } from "../services/firestoreService"
 import type { RootStackParamList } from "../navigation/types"
+import type { SavedLink } from "../types/link"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">
+
+type Section = {
+  title: string
+  data: SavedLink[]
+}
 
 export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth()
   const userId = user?.uid ?? ""
   const { links, loading, error } = useSavedLinks(userId)
 
+  const handleDelete = useCallback(async (linkId: string) => {
+    try {
+      await deleteLink(linkId)
+    } catch {
+      // silent - onSnapshot will keep the list in sync
+    }
+  }, [])
+
+  const sections = useMemo(() => {
+    const grouped = new Map<string, SavedLink[]>()
+    for (const link of links) {
+      const category = link.category ?? "Other"
+      const existing = grouped.get(category)
+      if (existing) {
+        existing.push(link)
+      } else {
+        grouped.set(category, [link])
+      }
+    }
+    const result: Section[] = []
+    for (const [title, data] of grouped) {
+      result.push({ title, data })
+    }
+    result.sort((a, b) => {
+      if (a.title === "Other") return 1
+      if (b.title === "Other") return -1
+      return a.title.localeCompare(b.title)
+    })
+    return result
+  }, [links])
+
   return (
     <Screen>
-      <View style={styles.header}>
-        <Text style={styles.title}>Para después</Text>
-        <View style={styles.headerActions}>
-          <Button title="Settings" onPress={() => navigation.navigate("Settings")} variant="secondary" />
-          <Button title="Add link" onPress={() => navigation.navigate("AddLink")} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.title}>para-despues</Text>
+            <Text style={styles.count}>{links.length} saved</Text>
+          </View>
+          <View style={styles.headerActions}>
+            <Button
+              title="Settings"
+              onPress={() => navigation.navigate("Settings")}
+              variant="secondary"
+              compact
+            />
+            <Button
+              title="+ Add"
+              onPress={() => navigation.navigate("AddLink")}
+              compact
+            />
+          </View>
         </View>
-      </View>
 
-      {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.primary} size="large" />
-        </View>
-      ) : error ? (
-        <View style={styles.center}>
-          <EmptyState title="Could not load your links" subtitle={error} />
-        </View>
-      ) : links.length === 0 ? (
-        <EmptyState
-          title="No saved links yet"
-          subtitle="Share a link from YouTube, Instagram or any app to save it here."
-        />
-      ) : (
-        <FlatList
-          data={links}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <LinkCard link={item} />}
-          contentContainerStyle={styles.list}
-          ListFooterComponent={<AppFooter />}
-        />
-      )}
+        {loading ? (
+          <View style={styles.center}>
+            <ActivityIndicator color={colors.accent} size="small" />
+          </View>
+        ) : error ? (
+          <View style={styles.center}>
+            <EmptyState title="Could not load your links" subtitle={error} />
+          </View>
+        ) : sections.length === 0 ? (
+          <EmptyState
+            title="No saved links"
+            subtitle="Share a link from any app to save it here."
+          />
+        ) : (
+          <SectionList
+            sections={sections}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <LinkCard link={item} onDelete={handleDelete} />}
+            renderSectionHeader={({ section }) => (
+              <Text style={styles.sectionHeader}>{section.title}</Text>
+            )}
+            contentContainerStyle={styles.list}
+            ListFooterComponent={<AppFooter />}
+          />
+        )}
+      </View>
     </Screen>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    maxWidth: Platform.OS === "web" ? 640 : undefined,
+    width: Platform.OS === "web" ? "100%" : undefined,
+    alignSelf: Platform.OS === "web" ? "center" : undefined,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 12,
-    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 8,
   },
   title: {
     color: colors.text,
-    fontSize: 24,
+    fontSize: 17,
     fontWeight: "700",
-    flexShrink: 1,
+    fontFamily: "monospace",
+    letterSpacing: -0.3,
+  },
+  count: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontFamily: "monospace",
   },
   headerActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   center: {
     flex: 1,
     justifyContent: "center",
   },
   list: {
-    paddingHorizontal: 16,
     paddingBottom: 24,
+  },
+  sectionHeader: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    paddingHorizontal: 12,
+    paddingTop: 14,
+    paddingBottom: 4,
+    fontFamily: "monospace",
   },
 })

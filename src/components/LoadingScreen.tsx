@@ -4,7 +4,7 @@ import { colors } from "../constants/colors"
 export function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <ActivityIndicator color={colors.primary} size="large" />
+      <ActivityIndicator color={colors.accent} size="small" />
     </View>
   )
 }

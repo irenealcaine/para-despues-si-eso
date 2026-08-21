@@ -71,39 +71,44 @@ export function AddLinkScreen({ navigation }: Props) {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>Add link</Text>
-          <Text style={styles.subtitle}>
-            Paste a URL from YouTube, Instagram or any website.
-          </Text>
-
-          <TextField
-            label="URL"
-            value={url}
-            onChangeText={setUrl}
-            placeholder="https://..."
-            keyboardType="url"
-            autoCapitalize="none"
-          />
-
-          {error ? (
-            <View style={styles.errorBox}>
-              <Text style={styles.error}>{error}</Text>
-              {isNoApiKeyError ? (
-                <Button
-                  title="Go to Settings"
-                  onPress={() => navigation.navigate("Settings")}
-                  variant="secondary"
-                />
-              ) : null}
-            </View>
-          ) : null}
-
-          <Button title="Save" onPress={handleSave} loading={saving} />
-          {saving ? (
-            <Text style={styles.processing}>
-              Detecting platform, getting info and generating title...
+          <View style={styles.header}>
+            <Text style={styles.title}>Add link</Text>
+            <Text style={styles.subtitle}>
+              Paste a URL from YouTube, Instagram or any website.
             </Text>
-          ) : null}
+          </View>
+
+          <View style={styles.form}>
+            <TextField
+              label="URL"
+              value={url}
+              onChangeText={setUrl}
+              placeholder="https://..."
+              keyboardType="url"
+              autoCapitalize="none"
+            />
+
+            {error ? (
+              <View style={styles.errorBox}>
+                <Text style={styles.error}>{error}</Text>
+                {isNoApiKeyError ? (
+                  <Button
+                    title="Go to Settings"
+                    onPress={() => navigation.navigate("Settings")}
+                    variant="secondary"
+                    compact
+                  />
+                ) : null}
+              </View>
+            ) : null}
+
+            <Button title="Save" onPress={handleSave} loading={saving} />
+            {saving ? (
+              <Text style={styles.processing}>
+                Detecting platform, getting info...
+              </Text>
+            ) : null}
+          </View>
         </View>
       </KeyboardAvoidingView>
     </Screen>
@@ -116,55 +121,57 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 24,
-    paddingTop: 32,
+    padding: 20,
+    paddingTop: 24,
+  },
+  header: {
+    marginBottom: 20,
+    gap: 4,
   },
   title: {
     color: colors.text,
-    fontSize: 26,
+    fontSize: 18,
     fontWeight: "700",
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 14,
-    marginTop: 6,
-    marginBottom: 24,
+  },
+  form: {
+    gap: 4,
   },
   errorBox: {
-    gap: 12,
-    marginBottom: 12,
+    gap: 8,
+    marginBottom: 8,
   },
   error: {
     color: colors.danger,
-    fontSize: 14,
+    fontSize: 13,
   },
   warning: {
     color: colors.warning,
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: 8,
+    fontSize: 12,
+    marginTop: 4,
   },
   processing: {
     color: colors.textMuted,
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: 12,
+    fontSize: 12,
+    marginTop: 4,
+    fontFamily: "monospace",
   },
   center: {
     flex: 1,
     justifyContent: "center",
     padding: 24,
-    gap: 16,
+    gap: 12,
   },
   successTitle: {
     color: colors.success,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "700",
-    textAlign: "center",
   },
   successSubtitle: {
     color: colors.text,
-    fontSize: 16,
-    textAlign: "center",
+    fontSize: 15,
   },
 })

@@ -13,7 +13,8 @@ type ButtonProps = {
   onPress: () => void
   loading?: boolean
   disabled?: boolean
-  variant?: "primary" | "secondary" | "danger"
+  variant?: "primary" | "secondary" | "danger" | "ghost"
+  compact?: boolean
 }
 
 export function Button({
@@ -22,6 +23,7 @@ export function Button({
   loading = false,
   disabled = false,
   variant = "primary",
+  compact = false,
 }: ButtonProps) {
   const isDisabled = disabled || loading
 
@@ -31,15 +33,18 @@ export function Button({
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
+        compact && styles.compact,
         variantStyles[variant],
         pressed && !isDisabled && styles.pressed,
         isDisabled && styles.disabled,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.text} />
+        <ActivityIndicator color={colors.text} size="small" />
       ) : (
-        <Text style={styles.label}>{title}</Text>
+        <Text style={[styles.label, compact && styles.labelCompact]}>
+          {title}
+        </Text>
       )}
     </Pressable>
   )
@@ -47,43 +52,57 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    borderRadius: 12,
+    minHeight: 40,
+    borderRadius: 6,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
-  group: {
-    flexDirection: "row",
-    gap: 8,
+  compact: {
+    minHeight: 34,
+    paddingHorizontal: 12,
   },
   label: {
     color: colors.text,
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "500",
+    letterSpacing: 0.2,
+  },
+  labelCompact: {
+    fontSize: 13,
   },
   pressed: {
-    opacity: 0.85,
+    opacity: 0.8,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
 })
 
 const variantStyles = StyleSheet.create({
   primary: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   secondary: {
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: colors.border,
   },
   danger: {
     backgroundColor: colors.danger,
   },
+  ghost: {
+    backgroundColor: "transparent",
+  },
 })
 
 export function ButtonGroup({ children }: { children: ReactNode }) {
-  return <View style={styles.group}>{children}</View>
+  return <View style={groupStyles.group}>{children}</View>
 }
+
+const groupStyles = StyleSheet.create({
+  group: {
+    flexDirection: "row",
+    gap: 6,
+  },
+})

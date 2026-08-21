@@ -24,11 +24,17 @@ export function TextField({
   error,
   onSubmitEditing,
 }: TextFieldProps) {
+  const isMono = keyboardType === "url" || keyboardType === "email-address"
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
-        style={[styles.input, error && styles.inputError]}
+        style={[
+          styles.input,
+          isMono && styles.mono,
+          error && styles.inputError,
+        ]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -46,30 +52,36 @@ export function TextField({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   label: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 8,
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: "500",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    marginBottom: 6,
   },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
     color: colors.text,
-    fontSize: 16,
+    fontSize: 15,
+  },
+  mono: {
+    fontFamily: "monospace",
+    fontSize: 14,
   },
   inputError: {
     borderColor: colors.danger,
   },
   errorText: {
     color: colors.danger,
-    fontSize: 12,
-    marginTop: 6,
+    fontSize: 11,
+    marginTop: 4,
   },
 })
