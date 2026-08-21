@@ -7,6 +7,7 @@ export type AppErrorCode =
   | "NETWORK_ERROR"
   | "NO_METADATA"
   | "NOT_SUPPORTED"
+  | "SAVE_FAILED"
 
 export class AppError extends Error {
   code: AppErrorCode
@@ -28,6 +29,7 @@ export const ERROR_MESSAGES: Record<AppErrorCode, string> = {
   NETWORK_ERROR: "No connection. Check your internet and try again.",
   NO_METADATA: "No additional information could be obtained from this link.",
   NOT_SUPPORTED: "This content type is not supported.",
+  SAVE_FAILED: "Could not save the link. Check your connection.",
 }
 
 export function getErrorMessage(error: unknown): string {

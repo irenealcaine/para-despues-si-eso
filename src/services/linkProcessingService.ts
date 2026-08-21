@@ -21,6 +21,8 @@ export async function processAndSaveLink(
   rawUrl: string,
   userId: string,
 ): Promise<ProcessLinkResult> {
+  console.log("[ProcessLink] Starting for:", rawUrl)
+
   if (!isValidHttpUrl(rawUrl)) {
     throw new AppError("INVALID_URL", "The provided text is not a valid URL")
   }
@@ -28,16 +30,42 @@ export async function processAndSaveLink(
   const url = normalizeUrl(rawUrl)
   const warnings: string[] = []
 
+  console.log("[ProcessLink] Normalized URL:", url)
+
   const { platform } = detectPlatform(url)
+  console.log("[ProcessLink] Platform:", platform)
 
-  const metadata = await fetchMetadataBestEffort(url, warnings)
+  let metadata: UrlMetadata
+  try {
+    metadata = await fetchMetadataBestEffort(url, warnings)
+    console.log("[ProcessLink] Metadata OK, title:", metadata.title)
+  } catch (err) {
+    console.warn("[ProcessLink] Metadata failed:", err)
+    metadata = { title: null, description: null, image: null, type: "unknown" }
+    warnings.push("No metadata available.")
+  }
 
-  const apiKey = await openAIKeyStore.get()
+  let apiKey: string | null = null
+  try {
+    apiKey = await openAIKeyStore.get()
+    console.log("[ProcessLink] API key:", apiKey ? "found" : "missing")
+  } catch (err) {
+    console.warn("[ProcessLink] SecureStore failed:", err)
+    throw new AppError("NO_API_KEY", "Could not read API key. Check Settings.")
+  }
+
   if (!apiKey) {
     throw new AppError("NO_API_KEY", "No OpenAI API key configured")
   }
 
-  const ai = await generateInfoBestEffort(apiKey, url, platform, metadata, warnings)
+  let ai = { title: null as string | null, category: null as LinkCategory | null }
+  try {
+    ai = await generateInfoBestEffort(apiKey, url, platform, metadata, warnings)
+    console.log("[ProcessLink] AI result:", ai)
+  } catch (err) {
+    console.warn("[ProcessLink] AI failed:", err)
+    warnings.push("OpenAI could not process this link.")
+  }
 
   const title = ai.title ?? metadata.title ?? titleFromUrl(url)
   const category = ai.category ?? DEFAULT_CATEGORY
@@ -49,14 +77,22 @@ export async function processAndSaveLink(
   const type: LinkType =
     metadata.type !== "unknown" ? metadata.type : inferType(url)
 
-  await addLink({
-    userId,
-    url,
-    platform,
-    type,
-    title,
-    category,
-  })
+  console.log("[ProcessLink] Saving to Firestore:", { title, category, type })
+
+  try {
+    await addLink({
+      userId,
+      url,
+      platform,
+      type,
+      title,
+      category,
+    })
+    console.log("[ProcessLink] Saved OK")
+  } catch (err) {
+    console.warn("[ProcessLink] Firestore save failed:", err)
+    throw new AppError("SAVE_FAILED", "Could not save the link. Check your connection.")
+  }
 
   return { title, category, warnings }
 }
@@ -67,7 +103,8 @@ async function fetchMetadataBestEffort(
 ): Promise<UrlMetadata> {
   try {
     return await fetchUrlMetadata(url)
-  } catch {
+  } catch (err) {
+    console.warn("[ProcessLink] fetchMetadata error:", err)
     warnings.push("No additional information could be obtained for this link.")
     return { title: null, description: null, image: null, type: "unknown" }
   }

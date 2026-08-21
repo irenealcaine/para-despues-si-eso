@@ -74,12 +74,18 @@ function emptyMetadata(type: LinkType): UrlMetadata {
 
 async function fetchWithTimeout(url: string): Promise<Response> {
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+  const timeout = setTimeout(() => {
+    try { controller.abort() } catch {}
+  }, FETCH_TIMEOUT_MS)
   try {
-    return await fetch(url, {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 14)" },
     })
+    return response
+  } catch (err) {
+    console.warn("[URLMetadata] fetch failed for:", url, err)
+    throw err
   } finally {
     clearTimeout(timeout)
   }
