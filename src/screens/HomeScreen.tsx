@@ -2,6 +2,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useCallback, useMemo } from "react"
 import {
   ActivityIndicator,
+  Pressable,
   SectionList,
   StyleSheet,
   Text,
@@ -11,6 +12,7 @@ import {
 import { AppFooter } from "../components/AppFooter"
 import { Button } from "../components/Button"
 import { EmptyState } from "../components/EmptyState"
+import { SaveIcon } from "../components/Icon"
 import { LinkCard } from "../components/LinkCard"
 import { Screen } from "../components/Screen"
 import { colors } from "../constants/colors"
@@ -78,11 +80,16 @@ export function HomeScreen({ navigation }: Props) {
               variant="secondary"
               compact
             />
-            <Button
-              title="+ Add"
+            <Pressable
               onPress={() => navigation.navigate("AddLink")}
-              compact
-            />
+              style={({ pressed }) => [
+                styles.addBtn,
+                pressed && styles.addBtnPressed,
+              ]}
+              accessibilityLabel="Add link"
+            >
+              <SaveIcon size={20} color={colors.text} />
+            </Pressable>
           </View>
         </View>
 
@@ -152,6 +159,17 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: "row",
     gap: 6,
+  },
+  addBtn: {
+    width: 38,
+    height: 34,
+    borderRadius: 6,
+    backgroundColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addBtnPressed: {
+    backgroundColor: colors.accentPressed,
   },
   center: {
     flex: 1,
