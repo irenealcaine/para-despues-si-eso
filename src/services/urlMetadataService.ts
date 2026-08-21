@@ -36,7 +36,7 @@ async function fetchYouTubeMetadata(url: string): Promise<UrlMetadata> {
     }
     return {
       title: data.title ?? null,
-      description: data.author_name ? `By ${data.author_name}` : null,
+      description: data.author_name ? `Por ${data.author_name}` : null,
       image: data.thumbnail_url ?? null,
       type: "video",
     }

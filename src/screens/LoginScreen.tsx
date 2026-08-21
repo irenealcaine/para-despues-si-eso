@@ -23,7 +23,7 @@ export function LoginScreen({ navigation }: Props) {
     setError(null)
 
     if (!email.trim() || !password) {
-      setError("Enter your email and password.")
+      setError("Introduce tu email y contraseña.")
       return
     }
 
@@ -46,7 +46,7 @@ export function LoginScreen({ navigation }: Props) {
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>para-despues</Text>
-            <Text style={styles.subtitle}>Save links to read later</Text>
+            <Text style={styles.subtitle}>Guarda enlaces para leer después</Text>
           </View>
 
           <View style={styles.form}>
@@ -54,7 +54,7 @@ export function LoginScreen({ navigation }: Props) {
               label="Email"
               value={email}
               onChangeText={setEmail}
-              placeholder="you@example.com"
+              placeholder="tu@ejemplo.com"
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -62,17 +62,17 @@ export function LoginScreen({ navigation }: Props) {
               label="Password"
               value={password}
               onChangeText={setPassword}
-              placeholder="Your password"
+              placeholder="Tu contraseña"
               secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={handleLogin}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Button title="Login" onPress={handleLogin} loading={loading} />
+            <Button title="Iniciar sesión" onPress={handleLogin} loading={loading} />
           </View>
 
           <Button
-            title="Create an account"
+            title="Crear una cuenta"
             onPress={() => navigation.navigate("Register")}
             variant="secondary"
           />

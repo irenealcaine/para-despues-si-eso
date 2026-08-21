@@ -28,7 +28,7 @@ export function AddLinkScreen({ navigation }: Props) {
     setNeedsApiKey(false)
 
     if (!url.trim()) {
-      setError("Enter a URL.")
+      setError("Introduce una URL.")
       return
     }
 
@@ -53,10 +53,10 @@ export function AddLinkScreen({ navigation }: Props) {
     return (
       <Screen>
         <View style={styles.center}>
-          <Text style={styles.successTitle}>Link saved</Text>
+          <Text style={styles.successTitle}>Enlace guardado</Text>
           <Text style={styles.successSubtitle}>{saved.title}</Text>
           {warning ? <Text style={styles.warning}>{warning}</Text> : null}
-          <Button title="Back to Home" onPress={() => navigation.goBack()} />
+          <Button title="Volver al inicio" onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -72,9 +72,9 @@ export function AddLinkScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Add link</Text>
+            <Text style={styles.title}>Añadir enlace</Text>
             <Text style={styles.subtitle}>
-              Paste a URL from YouTube, Instagram or any website.
+              Pega una URL de YouTube, Instagram o cualquier web.
             </Text>
           </View>
 
@@ -93,7 +93,7 @@ export function AddLinkScreen({ navigation }: Props) {
                 <Text style={styles.error}>{error}</Text>
                 {isNoApiKeyError ? (
                   <Button
-                    title="Go to Settings"
+                    title="Ir a Ajustes"
                     onPress={() => navigation.navigate("Settings")}
                     variant="secondary"
                     compact
@@ -102,10 +102,10 @@ export function AddLinkScreen({ navigation }: Props) {
               </View>
             ) : null}
 
-            <Button title="Save" onPress={handleSave} loading={saving} />
+            <Button title="Guardar" onPress={handleSave} loading={saving} />
             {saving ? (
               <Text style={styles.processing}>
-                Detecting platform, getting info...
+                Detectando plataforma, obteniendo info...
               </Text>
             ) : null}
           </View>

@@ -41,7 +41,7 @@ export function LinkCard({ link, onDelete }: Props) {
                 styles.iconBtn,
                 pressed && styles.pressed,
               ]}
-              accessibilityLabel="Open link"
+              accessibilityLabel="Abrir enlace"
             >
               <Text style={styles.iconOpen}>↗</Text>
             </Pressable>
@@ -52,7 +52,7 @@ export function LinkCard({ link, onDelete }: Props) {
                 styles.iconBtn,
                 pressed && styles.pressed,
               ]}
-              accessibilityLabel="Delete link"
+              accessibilityLabel="Eliminar enlace"
             >
               <Text style={styles.iconDelete}>×</Text>
             </Pressable>

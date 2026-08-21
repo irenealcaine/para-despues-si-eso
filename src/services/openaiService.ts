@@ -44,14 +44,14 @@ export async function validateApiKey(apiKey: string): Promise<void> {
       }),
     })
   } catch {
-    throw new AppError("NETWORK_ERROR", "OpenAI request failed")
+    throw new AppError("NETWORK_ERROR", "La solicitud a OpenAI falló")
   }
 
   if (response.status === 401) {
-    throw new AppError("INVALID_API_KEY", "OpenAI rejected the API key")
+    throw new AppError("INVALID_API_KEY", "OpenAI rechazó la API key")
   }
   if (!response.ok) {
-    throw new AppError("OPENAI_ERROR", `OpenAI error ${response.status}`)
+    throw new AppError("OPENAI_ERROR", `Error de OpenAI ${response.status}`)
   }
 }
 
@@ -90,14 +90,14 @@ export async function generateLinkInfo(
       body: JSON.stringify(body),
     })
   } catch {
-    throw new AppError("NETWORK_ERROR", "OpenAI request failed")
+    throw new AppError("NETWORK_ERROR", "La solicitud a OpenAI falló")
   }
 
   if (!response.ok) {
     if (response.status === 401) {
-      throw new AppError("INVALID_API_KEY", "OpenAI rejected the API key")
+    throw new AppError("INVALID_API_KEY", "OpenAI rechazó la API key")
     }
-    throw new AppError("OPENAI_ERROR", `OpenAI error ${response.status}`)
+    throw new AppError("OPENAI_ERROR", `Error de OpenAI ${response.status}`)
   }
 
   try {

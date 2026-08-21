@@ -25,7 +25,7 @@ export function SettingsScreen({ navigation }: Props) {
     setError(null)
 
     if (!apiKeyInput.trim()) {
-      setError("Enter your OpenAI API key.")
+      setError("Introduce tu API key de OpenAI.")
       return
     }
 
@@ -42,19 +42,19 @@ export function SettingsScreen({ navigation }: Props) {
 
   const handleDeleteKey = () => {
     Alert.alert(
-      "Delete API key",
-      "Your OpenAI API key will be removed from this device. Continue?",
+      "Eliminar API key",
+      "Tu API key de OpenAI se eliminará de este dispositivo. ¿Continuar?",
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => deleteKey() },
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", style: "destructive", onPress: () => deleteKey() },
       ],
     )
   }
 
   const handleLogout = () => {
-    Alert.alert("Log out", "You will need to log in again to see your links.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log out", style: "destructive", onPress: () => signOut() },
+    Alert.alert("Cerrar sesión", "Tendrás que iniciar sesión de nuevo para ver tus enlaces.", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Cerrar sesión", style: "destructive", onPress: () => signOut() },
     ])
   }
 
@@ -66,15 +66,15 @@ export function SettingsScreen({ navigation }: Props) {
           style={({ pressed }) => [styles.backBtn, pressed && styles.backPressed]}
         >
           <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backLabel}>Back</Text>
+          <Text style={styles.backLabel}>Volver</Text>
         </Pressable>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>Ajustes</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>OpenAI API key</Text>
+            <Text style={styles.sectionTitle}>API key de OpenAI</Text>
           </View>
 
           <View style={styles.statusCard}>
@@ -91,10 +91,10 @@ export function SettingsScreen({ navigation }: Props) {
               />
               <Text style={styles.statusText}>
                 {initializing
-                  ? "Checking..."
+                  ? "Comprobando..."
                   : hasApiKey
-                    ? "Configured"
-                    : "Not configured"}
+                    ? "Configurada"
+                    : "No configurada"}
               </Text>
             </View>
             {hasApiKey && keyHint ? (
@@ -114,9 +114,9 @@ export function SettingsScreen({ navigation }: Props) {
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <View style={styles.row}>
-            <Button title="Save key" onPress={handleSaveKey} loading={saving} compact />
+            <Button title="Guardar key" onPress={handleSaveKey} loading={saving} compact />
             {hasApiKey ? (
-              <Button title="Delete key" onPress={handleDeleteKey} variant="danger" compact />
+              <Button title="Eliminar key" onPress={handleDeleteKey} variant="danger" compact />
             ) : null}
           </View>
         </View>
@@ -124,7 +124,7 @@ export function SettingsScreen({ navigation }: Props) {
         <View style={styles.divider} />
 
         <View style={styles.section}>
-          <Button title="Log out" onPress={handleLogout} variant="danger" compact />
+          <Button title="Cerrar sesión" onPress={handleLogout} variant="danger" compact />
         </View>
 
         <AppFooter />

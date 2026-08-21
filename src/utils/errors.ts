@@ -20,16 +20,16 @@ export class AppError extends Error {
 }
 
 export const ERROR_MESSAGES: Record<AppErrorCode, string> = {
-  INVALID_URL: "The URL is not valid. Check it and try again.",
-  NO_API_KEY: "No OpenAI API key configured. Add it in Settings first.",
+  INVALID_URL: "La URL no es válida. Revísala e inténtalo de nuevo.",
+  NO_API_KEY: "No hay API key de OpenAI configurada. Añádela en Ajustes.",
   INVALID_API_KEY:
-    "The OpenAI API key is not valid. Check it in Settings and try again.",
-  OPENAI_ERROR: "OpenAI could not process this link right now.",
-  FIREBASE_ERROR: "Something went wrong saving the link. Try again.",
-  NETWORK_ERROR: "No connection. Check your internet and try again.",
-  NO_METADATA: "No additional information could be obtained from this link.",
-  NOT_SUPPORTED: "This content type is not supported.",
-  SAVE_FAILED: "Could not save the link. Check your connection.",
+    "La API key de OpenAI no es válida. Revísala en Ajustes e inténtalo de nuevo.",
+  OPENAI_ERROR: "OpenAI no pudo procesar este enlace ahora mismo.",
+  FIREBASE_ERROR: "Algo falló al guardar el enlace. Inténtalo de nuevo.",
+  NETWORK_ERROR: "Sin conexión. Comprueba tu internet e inténtalo de nuevo.",
+  NO_METADATA: "No se pudo obtener información adicional de este enlace.",
+  NOT_SUPPORTED: "Este tipo de contenido no es compatible.",
+  SAVE_FAILED: "No se pudo guardar el enlace. Comprueba tu conexión.",
 }
 
 export function getErrorMessage(error: unknown): string {
@@ -48,15 +48,15 @@ export function getErrorMessage(error: unknown): string {
 }
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
-  "auth/invalid-email": "The email address is not valid.",
-  "auth/user-disabled": "This account has been disabled.",
-  "auth/user-not-found": "No account found with this email.",
-  "auth/wrong-password": "Incorrect password.",
-  "auth/invalid-credential": "Incorrect email or password.",
-  "auth/email-already-in-use": "There is already an account with this email.",
-  "auth/weak-password": "The password must be at least 6 characters.",
-  "auth/too-many-requests": "Too many attempts. Try again later.",
-  "auth/network-request-failed": "No connection. Check your internet and try again.",
+  "auth/invalid-email": "La dirección de email no es válida.",
+  "auth/user-disabled": "Esta cuenta ha sido deshabilitada.",
+  "auth/user-not-found": "No se encontró cuenta con este email.",
+  "auth/wrong-password": "Contraseña incorrecta.",
+  "auth/invalid-credential": "Email o contraseña incorrectos.",
+  "auth/email-already-in-use": "Ya existe una cuenta con este email.",
+  "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+  "auth/too-many-requests": "Demasiados intentos. Inténtalo más tarde.",
+  "auth/network-request-failed": "Sin conexión. Comprueba tu internet e inténtalo de nuevo.",
 }
 
 export function getAuthErrorMessage(error: unknown): string {
@@ -68,7 +68,7 @@ export function getAuthErrorMessage(error: unknown): string {
     return AUTH_ERROR_MESSAGES[code]
   }
   if (code.startsWith("auth/")) {
-    return "Could not complete the authentication. Try again."
+    return "No se pudo completar la autenticación. Inténtalo de nuevo."
   }
   return getErrorMessage(error)
 }

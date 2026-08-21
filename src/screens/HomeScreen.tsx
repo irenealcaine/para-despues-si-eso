@@ -71,11 +71,11 @@ export function HomeScreen({ navigation }: Props) {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.title}>para-despues</Text>
-            <Text style={styles.count}>{links.length} saved</Text>
+            <Text style={styles.count}>{links.length} guardados</Text>
           </View>
           <View style={styles.headerActions}>
             <Button
-              title="Settings"
+              title="Ajustes"
               onPress={() => navigation.navigate("Settings")}
               variant="secondary"
               compact
@@ -86,7 +86,7 @@ export function HomeScreen({ navigation }: Props) {
                 styles.addBtn,
                 pressed && styles.addBtnPressed,
               ]}
-              accessibilityLabel="Add link"
+              accessibilityLabel="Añadir enlace"
             >
               <SaveIcon size={20} color={colors.text} />
             </Pressable>
@@ -99,12 +99,12 @@ export function HomeScreen({ navigation }: Props) {
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <EmptyState title="Could not load your links" subtitle={error} />
+            <EmptyState title="No se pudieron cargar tus enlaces" subtitle={error} />
           </View>
         ) : sections.length === 0 ? (
           <EmptyState
-            title="No saved links"
-            subtitle="Share a link from any app to save it here."
+            title="No hay enlaces guardados"
+            subtitle="Comparte un enlace desde cualquier app para guardarlo aquí."
           />
         ) : (
           <SectionList

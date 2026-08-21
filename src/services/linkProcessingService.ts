@@ -24,7 +24,7 @@ export async function processAndSaveLink(
   console.log("[ProcessLink] Starting for:", rawUrl)
 
   if (!isValidHttpUrl(rawUrl)) {
-    throw new AppError("INVALID_URL", "The provided text is not a valid URL")
+    throw new AppError("INVALID_URL", "El texto proporcionado no es una URL válida")
   }
 
   const url = normalizeUrl(rawUrl)
@@ -42,7 +42,7 @@ export async function processAndSaveLink(
   } catch (err) {
     console.warn("[ProcessLink] Metadata failed:", err)
     metadata = { title: null, description: null, image: null, type: "unknown" }
-    warnings.push("No metadata available.")
+    warnings.push("Metadatos no disponibles.")
   }
 
   let apiKey: string | null = null
@@ -51,11 +51,11 @@ export async function processAndSaveLink(
     console.log("[ProcessLink] API key:", apiKey ? "found" : "missing")
   } catch (err) {
     console.warn("[ProcessLink] SecureStore failed:", err)
-    throw new AppError("NO_API_KEY", "Could not read API key. Check Settings.")
+    throw new AppError("NO_API_KEY", "No se pudo leer la API key. Revisa Ajustes.")
   }
 
   if (!apiKey) {
-    throw new AppError("NO_API_KEY", "No OpenAI API key configured")
+    throw new AppError("NO_API_KEY", "No hay API key de OpenAI configurada")
   }
 
   let ai = { title: null as string | null, category: null as LinkCategory | null }
@@ -64,14 +64,14 @@ export async function processAndSaveLink(
     console.log("[ProcessLink] AI result:", ai)
   } catch (err) {
     console.warn("[ProcessLink] AI failed:", err)
-    warnings.push("OpenAI could not process this link.")
+    warnings.push("OpenAI no pudo procesar este enlace.")
   }
 
   const title = ai.title ?? metadata.title ?? titleFromUrl(url)
   const category = ai.category ?? DEFAULT_CATEGORY
 
   if (!ai.title && !metadata.title) {
-    warnings.push("No metadata available. A title was generated from the URL.")
+    warnings.push("Metadatos no disponibles. Se generó un título a partir de la URL.")
   }
 
   const type: LinkType =
@@ -91,7 +91,7 @@ export async function processAndSaveLink(
     console.log("[ProcessLink] Saved OK")
   } catch (err) {
     console.warn("[ProcessLink] Firestore save failed:", err)
-    throw new AppError("SAVE_FAILED", "Could not save the link. Check your connection.")
+    throw new AppError("SAVE_FAILED", "No se pudo guardar el enlace. Comprueba tu conexión.")
   }
 
   return { title, category, warnings }
@@ -105,7 +105,7 @@ async function fetchMetadataBestEffort(
     return await fetchUrlMetadata(url)
   } catch (err) {
     console.warn("[ProcessLink] fetchMetadata error:", err)
-    warnings.push("No additional information could be obtained for this link.")
+    warnings.push("No se pudo obtener información adicional de este enlace.")
     return { title: null, description: null, image: null, type: "unknown" }
   }
 }
@@ -120,15 +120,15 @@ async function generateInfoBestEffort(
   try {
     const ai = await generateLinkInfo(apiKey, { url, platform, metadata })
     if (!ai) {
-      warnings.push("OpenAI could not describe this link. A fallback title was used.")
+      warnings.push("OpenAI no pudo describir este enlace. Se usó un título alternativo.")
       return { title: null, category: null }
     }
     return { title: ai.title, category: ai.category }
   } catch (error) {
     if (error instanceof AppError && error.code === "INVALID_API_KEY") {
-      warnings.push("The OpenAI API key is invalid. Check it in Settings.")
+      warnings.push("La API key de OpenAI no es válida. Revísala en Ajustes.")
     } else {
-      warnings.push("OpenAI could not process this link. A fallback title was used.")
+      warnings.push("OpenAI no pudo procesar este enlace. Se usó un título alternativo.")
     }
     return { title: null, category: null }
   }

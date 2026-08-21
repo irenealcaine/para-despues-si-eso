@@ -6,10 +6,10 @@ export function ConfigError() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Configuration missing</Text>
+        <Text style={styles.title}>Configuración faltante</Text>
         <Text style={styles.body}>
-          Firebase is not configured. Copy .env.example to .env and fill in the
-          values of your Firebase project, then restart the app.
+          Firebase no está configurado. Copia .env.example a .env y rellena los
+          valores de tu proyecto Firebase, luego reinicia la app.
         </Text>
       </ScrollView>
     </Screen>

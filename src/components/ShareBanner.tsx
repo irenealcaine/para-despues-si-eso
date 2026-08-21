@@ -42,7 +42,7 @@ export function ShareBanner({
         <View style={styles.actions}>
           {onSettingsPress ? (
             <Button
-              title="Settings"
+              title="Ajustes"
               onPress={onSettingsPress}
               variant="secondary"
               compact
@@ -50,14 +50,14 @@ export function ShareBanner({
           ) : null}
           {onRetryPress && !processing ? (
             <Button
-              title="Retry"
+              title="Reintentar"
               onPress={onRetryPress}
               variant="secondary"
               compact
             />
           ) : null}
           {!processing ? (
-            <Button title="Close" onPress={onDismiss} variant="ghost" compact />
+            <Button title="Cerrar" onPress={onDismiss} variant="ghost" compact />
           ) : null}
         </View>
       </View>

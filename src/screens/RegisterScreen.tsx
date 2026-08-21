@@ -24,12 +24,12 @@ export function RegisterScreen({ navigation }: Props) {
     setError(null)
 
     if (!email.trim() || !password || !confirmPassword) {
-      setError("Fill in all the fields.")
+      setError("Rellena todos los campos.")
       return
     }
 
     if (password !== confirmPassword) {
-      setError("The passwords do not match.")
+      setError("Las contraseñas no coinciden.")
       return
     }
 
@@ -51,7 +51,7 @@ export function RegisterScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Create account</Text>
+            <Text style={styles.title}>Crear cuenta</Text>
           </View>
 
           <View style={styles.form}>
@@ -59,7 +59,7 @@ export function RegisterScreen({ navigation }: Props) {
               label="Email"
               value={email}
               onChangeText={setEmail}
-              placeholder="you@example.com"
+              placeholder="tu@ejemplo.com"
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -67,25 +67,25 @@ export function RegisterScreen({ navigation }: Props) {
               label="Password"
               value={password}
               onChangeText={setPassword}
-              placeholder="At least 6 characters"
+              placeholder="Mínimo 6 caracteres"
               secureTextEntry
               autoCapitalize="none"
             />
             <TextField
-              label="Confirm password"
+              label="Confirmar contraseña"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              placeholder="Repeat your password"
+              placeholder="Repite tu contraseña"
               secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={handleRegister}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Button title="Register" onPress={handleRegister} loading={loading} />
+            <Button title="Registrarse" onPress={handleRegister} loading={loading} />
           </View>
 
           <Button
-            title="I already have an account"
+            title="Ya tengo una cuenta"
             onPress={() => navigation.navigate("Login")}
             variant="secondary"
           />
