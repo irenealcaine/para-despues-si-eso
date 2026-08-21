@@ -28,23 +28,29 @@ export function ShareIntentHandler() {
   useEffect(() => {
     if (!hasShareIntent) return
 
-    const rawText = shareIntent.webUrl ?? shareIntent.text ?? ""
-    const url = extractUrl(rawText)
+    try {
+      const rawText = shareIntent?.webUrl ?? shareIntent?.text ?? ""
+      const url = extractUrl(rawText)
 
-    if (!url) {
-      showMessage("Contenido no compatible. Solo se guardan enlaces.", "error")
+      if (!url) {
+        showMessage("Contenido no compatible. Solo se guardan enlaces.", "error")
+        resetShareIntent()
+        return
+      }
+
+      autoAttemptedUrl.current = null
+      setPendingUrl(url)
       resetShareIntent()
-      return
-    }
 
-    autoAttemptedUrl.current = null
-    setPendingUrl(url)
-    resetShareIntent()
-
-    if (!user) {
-      showMessage("Inicia sesión para guardar el enlace compartido.", "info")
-    } else if (!hasApiKey) {
-      showMessage("Configura tu API key de OpenAI para guardar este enlace.", "error")
+      if (!user) {
+        showMessage("Inicia sesión para guardar el enlace compartido.", "info")
+      } else if (!hasApiKey) {
+        showMessage("Configura tu API key de OpenAI para guardar este enlace.", "error")
+      }
+    } catch (err) {
+      console.warn("[ShareIntent] Error processing share intent:", err)
+      showMessage("Error al procesar el enlace compartido.", "error")
+      resetShareIntent()
     }
   }, [hasShareIntent, shareIntent, user, hasApiKey])
 
@@ -57,7 +63,9 @@ export function ShareIntentHandler() {
       !processing
     ) {
       autoAttemptedUrl.current = pendingUrl
-      processPendingUrl(user.uid)
+      processPendingUrl(user.uid).catch((err) => {
+        console.warn("[ShareIntent] Auto-process failed:", err)
+      })
     }
   }, [pendingUrl, user, hasApiKey, processing])
 
@@ -87,7 +95,11 @@ export function ShareIntentHandler() {
       onSettingsPress={user && !hasApiKey ? () => navigate("Settings") : undefined}
       onRetryPress={
         user && hasApiKey && pendingUrl && !keyInitializing
-          ? () => processPendingUrl(user.uid)
+          ? () => {
+              processPendingUrl(user.uid).catch((err) => {
+                console.warn("[ShareIntent] Retry failed:", err)
+              })
+            }
           : undefined
       }
       onDismiss={() => {

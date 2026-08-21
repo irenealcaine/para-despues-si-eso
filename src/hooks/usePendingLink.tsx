@@ -32,17 +32,25 @@ export function PendingLinkProvider({ children }: { children: ReactNode }) {
       if (stored) {
         setPendingUrlState(stored)
       }
-    })
+    }).catch(() => {})
   }, [])
 
   const setPendingUrl = async (url: string) => {
     setPendingUrlState(url)
-    await AsyncStorage.setItem(PENDING_URL_KEY, url)
+    try {
+      await AsyncStorage.setItem(PENDING_URL_KEY, url)
+    } catch {
+      // non-critical
+    }
   }
 
   const clearPendingUrl = async () => {
     setPendingUrlState(null)
-    await AsyncStorage.removeItem(PENDING_URL_KEY)
+    try {
+      await AsyncStorage.removeItem(PENDING_URL_KEY)
+    } catch {
+      // non-critical
+    }
   }
 
   const showMessage = (nextMessage: string, type: BannerType = "info") => {
@@ -66,6 +74,7 @@ export function PendingLinkProvider({ children }: { children: ReactNode }) {
         showMessage("Enlace guardado", "success")
       }
     } catch (error) {
+      console.warn("[PendingLink] Process error:", error)
       if (error instanceof AppError && error.code === "INVALID_URL") {
         await clearPendingUrl()
       }
