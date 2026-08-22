@@ -10,9 +10,8 @@ import {
   Platform,
 } from "react-native"
 import { AppFooter } from "../components/AppFooter"
-import { Button } from "../components/Button"
 import { EmptyState } from "../components/EmptyState"
-import { SaveIcon } from "../components/Icon"
+import { SaveIcon, SettingsIcon } from "../components/Icon"
 import { LinkCard } from "../components/LinkCard"
 import { Screen } from "../components/Screen"
 import { colors } from "../constants/colors"
@@ -74,12 +73,16 @@ export function HomeScreen({ navigation }: Props) {
             <Text style={styles.count}>{links.length} guardados</Text>
           </View>
           <View style={styles.headerActions}>
-            <Button
-              title="Ajustes"
+            <Pressable
               onPress={() => navigation.navigate("Settings")}
-              variant="secondary"
-              compact
-            />
+              style={({ pressed }) => [
+                styles.settingsBtn,
+                pressed && styles.settingsBtnPressed,
+              ]}
+              accessibilityLabel="Ajustes"
+            >
+              <SettingsIcon size={20} color={colors.text} />
+            </Pressable>
             <Pressable
               onPress={() => navigation.navigate("AddLink")}
               style={({ pressed }) => [
@@ -170,6 +173,17 @@ const styles = StyleSheet.create({
   },
   addBtnPressed: {
     backgroundColor: colors.accentPressed,
+  },
+  settingsBtn: {
+    width: 38,
+    height: 34,
+    borderRadius: 6,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsBtnPressed: {
+    backgroundColor: colors.borderFocus,
   },
   center: {
     flex: 1,
