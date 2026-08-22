@@ -57,8 +57,8 @@ export function HomeScreen({ navigation }: Props) {
       result.push({ title, data })
     }
     result.sort((a, b) => {
-      if (a.title === "Other") return 1
-      if (b.title === "Other") return -1
+      if (a.title === "Otros") return 1
+      if (b.title === "Otros") return -1
       return a.title.localeCompare(b.title)
     })
     return result
