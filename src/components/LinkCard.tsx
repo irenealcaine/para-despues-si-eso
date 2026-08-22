@@ -1,4 +1,4 @@
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native"
+import { Alert, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native"
 import { colors } from "../constants/colors"
 import type { SavedLink } from "../types/link"
 import { formatTimestamp } from "../utils/date"
@@ -17,6 +17,20 @@ type Props = {
 }
 
 export function LinkCard({ link, onDelete }: Props) {
+  const confirmDelete = () => {
+    const message = `¿Seguro que quieres eliminar "${link.title}"?`
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) {
+        onDelete(link.id)
+      }
+      return
+    }
+    Alert.alert("Eliminar enlace", message, [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Eliminar", style: "destructive", onPress: () => onDelete(link.id) },
+    ])
+  }
+
   return (
     <View style={styles.card}>
       <View style={styles.leftAccent} />
@@ -47,7 +61,7 @@ export function LinkCard({ link, onDelete }: Props) {
             </Pressable>
             <View style={styles.separator} />
             <Pressable
-              onPress={() => onDelete(link.id)}
+              onPress={confirmDelete}
               style={({ pressed }) => [
                 styles.iconBtn,
                 pressed && styles.pressed,

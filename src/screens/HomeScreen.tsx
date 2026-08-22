@@ -70,7 +70,7 @@ export function HomeScreen({ navigation }: Props) {
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>para-despues</Text>
+            <Text style={styles.title}>Para después</Text>
             <Text style={styles.count}>{links.length} guardados</Text>
           </View>
           <View style={styles.headerActions}>
