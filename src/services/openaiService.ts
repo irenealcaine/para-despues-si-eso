@@ -24,9 +24,9 @@ const MAX_TITLE_LENGTH = 120
 
 const SYSTEM_PROMPT = `You extract minimal information from a saved link.
 Return ONLY a JSON object with these two keys:
-- "title": a short, descriptive title of the content (max 10 words). Use the language of the available content when it can be detected, otherwise English. Never invent content.
+- "title": a short, descriptive title of the content (max 10 words). Use the language of the available content when it can be detected, otherwise Spanish. Never invent content.
 - "category": exactly one of these categories: ${CATEGORIES.join(", ")}.
-Choose the single best matching category. Never create a new category. If nothing fits, use "Other".`
+Choose the single best matching category. Never create a new category. If nothing fits, use "Otros".`
 
 export async function validateApiKey(apiKey: string): Promise<void> {
   let response: Response

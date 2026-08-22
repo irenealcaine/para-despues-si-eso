@@ -6,6 +6,8 @@ import { formatTimestamp } from "../utils/date"
 const PLATFORM_LABELS: Record<SavedLink["platform"], string> = {
   youtube: "YT",
   instagram: "IG",
+  twitter: "X",
+  threads: "TH",
   other: "WEB",
 }
 
@@ -28,8 +30,6 @@ export function LinkCard({ link, onDelete }: Props) {
         <View style={styles.bottomRow}>
           <View style={styles.metaRow}>
             <Text style={styles.platform}>{PLATFORM_LABELS[link.platform]}</Text>
-            <Text style={styles.dot}>·</Text>
-            <Text style={styles.category}>{link.category}</Text>
             <Text style={styles.dot}>·</Text>
             <Text style={styles.date}>{formatTimestamp(link.createdAt)}</Text>
           </View>

@@ -17,6 +17,14 @@ export function detectPlatform(rawUrl: string): PlatformDetection {
     return { platform: "instagram", type: "unknown" }
   }
 
+  if (isTwitterHost(host)) {
+    return { platform: "twitter", type: "webpage" }
+  }
+
+  if (isThreadsHost(host)) {
+    return { platform: "threads", type: "webpage" }
+  }
+
   return { platform: "other", type: "unknown" }
 }
 
@@ -45,5 +53,25 @@ function isInstagramHost(host: string): boolean {
     host === "www.instagram.com" ||
     host === "m.instagram.com" ||
     host === "instagr.am"
+  )
+}
+
+function isTwitterHost(host: string): boolean {
+  return (
+    host === "x.com" ||
+    host === "www.x.com" ||
+    host === "twitter.com" ||
+    host === "www.twitter.com" ||
+    host === "m.twitter.com" ||
+    host === "mobile.twitter.com"
+  )
+}
+
+function isThreadsHost(host: string): boolean {
+  return (
+    host === "threads.net" ||
+    host === "www.threads.net" ||
+    host === "threads.app" ||
+    host === "www.threads.app"
   )
 }
