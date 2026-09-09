@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { getApps, initializeApp, type FirebaseApp } from "firebase/app"
 import {
   browserLocalPersistence,
+  getAuth,
   getReactNativePersistence,
   initializeAuth,
   type Auth,
@@ -39,16 +40,22 @@ export function getFirebaseApp(): FirebaseApp {
 }
 
 export function getAuthInstance(): Auth {
-  if (!auth) {
-    if (Platform.OS === "web") {
-      auth = initializeAuth(getFirebaseApp(), {
-        persistence: browserLocalPersistence,
-      })
-    } else {
-      auth = initializeAuth(getFirebaseApp(), {
-        persistence: getReactNativePersistence(AsyncStorage),
-      })
-    }
+  if (auth) return auth
+  try {
+    // Si ya existe (HMR en web), reutilizar en vez de reventar.
+    auth = getAuth(getFirebaseApp())
+    return auth
+  } catch {
+    // No hay instancia todavía: crearla con la persistencia adecuada.
+  }
+  if (Platform.OS === "web") {
+    auth = initializeAuth(getFirebaseApp(), {
+      persistence: browserLocalPersistence,
+    })
+  } else {
+    auth = initializeAuth(getFirebaseApp(), {
+      persistence: getReactNativePersistence(AsyncStorage),
+    })
   }
   return auth
 }

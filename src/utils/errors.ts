@@ -41,7 +41,7 @@ export function getErrorMessage(error: unknown): string {
   if (/network|fetch|timeout/i.test(message)) {
     return ERROR_MESSAGES.NETWORK_ERROR
   }
-  if (/firebase|permission|not-found|unavailable/i.test(message)) {
+  if (/firebase|firestore|permission|not-found|unavailable|failed-precondition|requires an index/i.test(message)) {
     return ERROR_MESSAGES.FIREBASE_ERROR
   }
   return ERROR_MESSAGES.OPENAI_ERROR

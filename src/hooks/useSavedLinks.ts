@@ -9,6 +9,12 @@ export function useSavedLinks(userId: string) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!userId) {
+      setLinks([])
+      setLoading(false)
+      setError(null)
+      return
+    }
     setLoading(true)
     setError(null)
     const unsubscribe = subscribeToLinks(
