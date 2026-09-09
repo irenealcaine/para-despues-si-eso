@@ -79,6 +79,7 @@ export function SettingsScreen({ navigation }: Props) {
 
           <View style={styles.statusCard}>
             <Text style={styles.accountEmail}>{user?.email ?? "Sesión no disponible"}</Text>
+            {user?.uid ? <Text style={styles.accountUid}>UID: {user.uid}</Text> : null}
           </View>
         </View>
 
@@ -240,6 +241,12 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     fontWeight: "600",
+  },
+  accountUid: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontFamily: "monospace",
+    marginTop: 4,
   },
   row: {
     flexDirection: "row",
