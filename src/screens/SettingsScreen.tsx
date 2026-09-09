@@ -14,7 +14,7 @@ import { getErrorMessage } from "../utils/errors"
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">
 
 export function SettingsScreen({ navigation }: Props) {
-  const { signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const { hasApiKey, keyHint, initializing, saveKey, deleteKey } = useOpenAIKey()
   const [apiKeyInput, setApiKeyInput] = useState("")
   const [saving, setSaving] = useState(false)
@@ -72,6 +72,18 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Cuenta</Text>
+          </View>
+
+          <View style={styles.statusCard}>
+            <Text style={styles.accountEmail}>{user?.email ?? "Sesión no disponible"}</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>API key de OpenAI</Text>
@@ -223,6 +235,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "monospace",
     marginLeft: 16,
+  },
+  accountEmail: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: "600",
   },
   row: {
     flexDirection: "row",
