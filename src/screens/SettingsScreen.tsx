@@ -7,7 +7,6 @@ import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
 import { layout } from "../constants/layout"
-import { getFirebaseProjectId } from "../firebase/config"
 import { useAuth } from "../hooks/useAuth"
 import { useOpenAIKey } from "../hooks/useOpenAIKey"
 import type { RootStackParamList } from "../navigation/types"
@@ -83,8 +82,6 @@ export function SettingsScreen({ navigation }: Props) {
 
           <View style={styles.statusCard}>
             <Text style={styles.accountEmail}>{user?.email ?? "Sesión no disponible"}</Text>
-            {user?.uid ? <Text style={styles.accountUid}>UID: {user.uid}</Text> : null}
-            <Text style={styles.accountUid}>Proyecto: {getFirebaseProjectId()}</Text>
           </View>
         </View>
 
@@ -251,12 +248,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 14,
     fontWeight: "600",
-  },
-  accountUid: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontFamily: "monospace",
-    marginTop: 4,
   },
   row: {
     flexDirection: "row",
