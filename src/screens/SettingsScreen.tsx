@@ -6,6 +6,7 @@ import { Button } from "../components/Button"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
+import { layout } from "../constants/layout"
 import { getFirebaseProjectId } from "../firebase/config"
 import { useAuth } from "../hooks/useAuth"
 import { useOpenAIKey } from "../hooks/useOpenAIKey"
@@ -62,18 +63,19 @@ export function SettingsScreen({ navigation }: Props) {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backPressed]}
-        >
-          <Text style={styles.backIcon}>←</Text>
-          <Text style={styles.backLabel}>Volver</Text>
-        </Pressable>
-        <Text style={styles.title}>Ajustes</Text>
-      </View>
+      <View style={styles.page}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={({ pressed }) => [styles.backBtn, pressed && styles.backPressed]}
+          >
+            <Text style={styles.backIcon}>←</Text>
+            <Text style={styles.backLabel}>Volver</Text>
+          </Pressable>
+          <Text style={styles.title}>Ajustes</Text>
+        </View>
 
-      <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Cuenta</Text>
@@ -144,12 +146,17 @@ export function SettingsScreen({ navigation }: Props) {
         </View>
 
         <AppFooter />
-      </ScrollView>
+        </ScrollView>
+      </View>
     </Screen>
   )
 }
 
 const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    ...layout.webContent,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",

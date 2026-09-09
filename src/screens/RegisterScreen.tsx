@@ -5,6 +5,7 @@ import { Button } from "../components/Button"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
+import { layout } from "../constants/layout"
 import { useAuth } from "../hooks/useAuth"
 import type { RootStackParamList } from "../navigation/types"
 import { getAuthErrorMessage } from "../utils/errors"
@@ -104,6 +105,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
     gap: 24,
+    ...layout.webForm,
   },
   header: {
     gap: 4,
