@@ -17,7 +17,7 @@ import { Screen } from "../components/Screen"
 import { colors } from "../constants/colors"
 import { useAuth } from "../hooks/useAuth"
 import { useSavedLinks } from "../hooks/useSavedLinks"
-import { deleteLink } from "../services/firestoreService"
+import { deleteLink, updateLinkTitle } from "../services/firestoreService"
 import type { RootStackParamList } from "../navigation/types"
 import type { SavedLink } from "../types/link"
 
@@ -41,8 +41,16 @@ export function HomeScreen({ navigation }: Props) {
     }
   }, [])
 
-  const sections = useMemo(() => {
-    const grouped = new Map<string, SavedLink[]>()
+  const handleEditTitle = useCallback(
+    async (linkId: string, newTitle: string) => {
+      await updateLinkTitle(linkId, newTitle)
+    },
+    [],
+  )
+
+  const latestId = links[0]?.id
+
+  const sections = useMemo(() => {    const grouped = new Map<string, SavedLink[]>()
     for (const link of links) {
       const category = link.category ?? "Other"
       const existing = grouped.get(category)
@@ -113,7 +121,14 @@ export function HomeScreen({ navigation }: Props) {
           <SectionList
             sections={sections}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <LinkCard link={item} onDelete={handleDelete} />}
+            renderItem={({ item }) => (
+              <LinkCard
+                link={item}
+                onDelete={handleDelete}
+                onEditTitle={handleEditTitle}
+                isLatest={item.id === latestId}
+              />
+            )}
             renderSectionHeader={({ section }) => (
               <Text style={styles.sectionHeader}>{section.title}</Text>
             )}

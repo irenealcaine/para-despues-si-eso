@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where,
   type Timestamp,
   type Unsubscribe,
@@ -63,4 +64,15 @@ export async function addLink(input: LinkInput): Promise<void> {
 
 export async function deleteLink(linkId: string): Promise<void> {
   await deleteDoc(doc(getDb(), "links", linkId))
+}
+
+export async function updateLinkTitle(
+  linkId: string,
+  title: string,
+): Promise<void> {
+  const trimmed = title.trim()
+  if (!trimmed) {
+    throw new Error("El título no puede estar vacío.")
+  }
+  await updateDoc(doc(getDb(), "links", linkId), { title: trimmed })
 }

@@ -1,4 +1,14 @@
-import { Alert, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native"
+import {
+  Alert,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native"
+import { useEffect, useState } from "react"
 import { colors } from "../constants/colors"
 import type { SavedLink } from "../types/link"
 import { formatTimestamp } from "../utils/date"
@@ -14,9 +24,21 @@ const PLATFORM_LABELS: Record<SavedLink["platform"], string> = {
 type Props = {
   link: SavedLink
   onDelete: (linkId: string) => void
+  onEditTitle: (linkId: string, newTitle: string) => Promise<void>
+  isLatest?: boolean
 }
 
-export function LinkCard({ link, onDelete }: Props) {
+export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Props) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(link.title)
+  const [saving, setSaving] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!editing) {
+      setDraft(link.title)
+    }
+  }, [link.title, editing])
   const confirmDelete = () => {
     const message = `¿Seguro que quieres eliminar "${link.title}"?`
     if (Platform.OS === "web") {
@@ -31,14 +53,72 @@ export function LinkCard({ link, onDelete }: Props) {
     ])
   }
 
+  const startEditing = () => {
+    setDraft(link.title)
+    setEditError(null)
+    setEditing(true)
+  }
+
+  const cancelEditing = () => {
+    setEditing(false)
+    setDraft(link.title)
+    setEditError(null)
+  }
+
+  const saveEditing = async () => {
+    if (saving) return
+    const trimmed = draft.trim()
+    if (!trimmed) {
+      setEditError("El título no puede estar vacío.")
+      return
+    }
+    if (trimmed === link.title) {
+      setEditing(false)
+      return
+    }
+    setSaving(true)
+    setEditError(null)
+    try {
+      await onEditTitle(link.id, trimmed)
+      setEditing(false)
+    } catch {
+      setEditError("No se pudo guardar el título.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
-    <View style={styles.card}>
-      <View style={styles.leftAccent} />
+    <View style={[styles.card, isLatest && styles.cardLatest]}>
+      <View style={[styles.leftAccent, isLatest && styles.leftAccentLatest]} />
       <View style={styles.content}>
         <View style={styles.topRow}>
-          <Text style={styles.title} numberOfLines={2}>
-            {link.title}
-          </Text>
+          {isLatest ? (
+            <Text style={styles.latestBadge} accessibilityLabel="Último enlace añadido">
+              NUEVO
+            </Text>
+          ) : null}
+          {editing ? (
+            <View style={styles.editBox}>
+              <TextInput
+                style={styles.editInput}
+                value={draft}
+                onChangeText={setDraft}
+                autoFocus
+                editable={!saving}
+                onSubmitEditing={saveEditing}
+                returnKeyType="done"
+                accessibilityLabel="Editar título del enlace"
+              />
+              {editError ? (
+                <Text style={styles.editError}>{editError}</Text>
+              ) : null}
+            </View>
+          ) : (
+            <Text style={styles.title} numberOfLines={2}>
+              {link.title}
+            </Text>
+          )}
         </View>
 
         <View style={styles.bottomRow}>
@@ -49,27 +129,68 @@ export function LinkCard({ link, onDelete }: Props) {
           </View>
 
           <View style={styles.actions}>
-            <Pressable
-              onPress={() => Linking.openURL(link.url)}
-              style={({ pressed }) => [
-                styles.iconBtn,
-                pressed && styles.pressed,
-              ]}
-              accessibilityLabel="Abrir enlace"
-            >
-              <Text style={styles.iconOpen}>↗</Text>
-            </Pressable>
-            <View style={styles.separator} />
-            <Pressable
-              onPress={confirmDelete}
-              style={({ pressed }) => [
-                styles.iconBtn,
-                pressed && styles.pressed,
-              ]}
-              accessibilityLabel="Eliminar enlace"
-            >
-              <Text style={styles.iconDelete}>×</Text>
-            </Pressable>
+            {editing ? (
+              <>
+                <Pressable
+                  onPress={saveEditing}
+                  disabled={saving}
+                  style={({ pressed }) => [
+                    styles.iconBtn,
+                    pressed && styles.pressed,
+                  ]}
+                  accessibilityLabel="Guardar título"
+                >
+                  <Text style={styles.iconSave}>✓</Text>
+                </Pressable>
+                <View style={styles.separator} />
+                <Pressable
+                  onPress={cancelEditing}
+                  disabled={saving}
+                  style={({ pressed }) => [
+                    styles.iconBtn,
+                    pressed && styles.pressed,
+                  ]}
+                  accessibilityLabel="Cancelar edición"
+                >
+                  <Text style={styles.iconCancel}>×</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Pressable
+                  onPress={() => Linking.openURL(link.url)}
+                  style={({ pressed }) => [
+                    styles.iconBtn,
+                    pressed && styles.pressed,
+                  ]}
+                  accessibilityLabel="Abrir enlace"
+                >
+                  <Text style={styles.iconOpen}>↗</Text>
+                </Pressable>
+                <View style={styles.separator} />
+                <Pressable
+                  onPress={startEditing}
+                  style={({ pressed }) => [
+                    styles.iconBtn,
+                    pressed && styles.pressed,
+                  ]}
+                  accessibilityLabel="Editar título"
+                >
+                  <Text style={styles.iconEdit}>✎</Text>
+                </Pressable>
+                <View style={styles.separator} />
+                <Pressable
+                  onPress={confirmDelete}
+                  style={({ pressed }) => [
+                    styles.iconBtn,
+                    pressed && styles.pressed,
+                  ]}
+                  accessibilityLabel="Eliminar enlace"
+                >
+                  <Text style={styles.iconDelete}>×</Text>
+                </Pressable>
+              </>
+            )}
           </View>
         </View>
       </View>
@@ -84,9 +205,28 @@ const styles = StyleSheet.create({
     marginBottom: 1,
     minHeight: 52,
   },
+  cardLatest: {
+    backgroundColor: colors.surfaceAlt,
+  },
   leftAccent: {
     width: 2,
     backgroundColor: colors.border,
+  },
+  leftAccentLatest: {
+    backgroundColor: colors.accent,
+  },
+  latestBadge: {
+    color: colors.background,
+    backgroundColor: colors.accent,
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily: "monospace",
+    letterSpacing: 0.8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    overflow: "hidden",
+    alignSelf: "flex-start",
   },
   content: {
     flex: 1,
@@ -166,6 +306,46 @@ const styles = StyleSheet.create({
     fontFamily: "monospace",
     fontWeight: "700",
     marginTop: -1,
+  },
+  iconEdit: {
+    color: colors.textMuted,
+    fontSize: 16,
+    fontFamily: "monospace",
+    fontWeight: "700",
+  },
+  iconSave: {
+    color: colors.success,
+    fontSize: 18,
+    fontFamily: "monospace",
+    fontWeight: "700",
+  },
+  iconCancel: {
+    color: colors.textMuted,
+    fontSize: 22,
+    fontFamily: "monospace",
+    fontWeight: "700",
+    marginTop: -1,
+  },
+  editBox: {
+    flex: 1,
+    gap: 4,
+  },
+  editInput: {
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.borderFocus,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "600",
+    lineHeight: 20,
+  },
+  editError: {
+    color: colors.danger,
+    fontSize: 11,
+    fontFamily: "monospace",
   },
   separator: {
     width: 1,
