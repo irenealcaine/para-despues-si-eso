@@ -1,14 +1,16 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useState } from "react"
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { AppFooter } from "../components/AppFooter"
 import { Button } from "../components/Button"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
+import { getFirebaseProjectId } from "../firebase/config"
 import { useAuth } from "../hooks/useAuth"
 import { useOpenAIKey } from "../hooks/useOpenAIKey"
 import type { RootStackParamList } from "../navigation/types"
+import { confirmDestructive } from "../utils/confirm"
 import { getErrorMessage } from "../utils/errors"
 
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">
@@ -41,21 +43,21 @@ export function SettingsScreen({ navigation }: Props) {
   }
 
   const handleDeleteKey = () => {
-    Alert.alert(
+    confirmDestructive(
       "Eliminar API key",
       "Tu API key de OpenAI se eliminará de este dispositivo. ¿Continuar?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Eliminar", style: "destructive", onPress: () => deleteKey() },
-      ],
+      "Eliminar",
+      () => deleteKey(),
     )
   }
 
   const handleLogout = () => {
-    Alert.alert("Cerrar sesión", "Tendrás que iniciar sesión de nuevo para ver tus enlaces.", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Cerrar sesión", style: "destructive", onPress: () => signOut() },
-    ])
+    confirmDestructive(
+      "Cerrar sesión",
+      "Tendrás que iniciar sesión de nuevo para ver tus enlaces.",
+      "Cerrar sesión",
+      () => signOut(),
+    )
   }
 
   return (
@@ -80,6 +82,7 @@ export function SettingsScreen({ navigation }: Props) {
           <View style={styles.statusCard}>
             <Text style={styles.accountEmail}>{user?.email ?? "Sesión no disponible"}</Text>
             {user?.uid ? <Text style={styles.accountUid}>UID: {user.uid}</Text> : null}
+            <Text style={styles.accountUid}>Proyecto: {getFirebaseProjectId()}</Text>
           </View>
         </View>
 
