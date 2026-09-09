@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm expo export -p web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA fallback: todas las rutas sirven index.html (el export es output:single).
+# Se mantiene también public/_redirects como respaldo según la doc de Expo.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
