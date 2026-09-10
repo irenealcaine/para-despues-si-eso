@@ -10,6 +10,7 @@ import {
 } from "react-native"
 import { useEffect, useState } from "react"
 import { colors } from "../constants/colors"
+import { useLanguage } from "../hooks/useLanguage"
 import type { SavedLink } from "../types/link"
 import { formatTimestamp } from "../utils/date"
 
@@ -29,6 +30,7 @@ type Props = {
 }
 
 export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Props) {
+  const { language, t } = useLanguage()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(link.title)
   const [saving, setSaving] = useState(false)
@@ -40,16 +42,16 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
     }
   }, [link.title, editing])
   const confirmDelete = () => {
-    const message = `¿Seguro que quieres eliminar "${link.title}"?`
+    const message = t("deleteLinkConfirm", { title: link.title })
     if (Platform.OS === "web") {
       if (window.confirm(message)) {
         onDelete(link.id)
       }
       return
     }
-    Alert.alert("Eliminar enlace", message, [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Eliminar", style: "destructive", onPress: () => onDelete(link.id) },
+    Alert.alert(t("deleteLinkTitle"), message, [
+      { text: t("cancel"), style: "cancel" },
+      { text: t("delete"), style: "destructive", onPress: () => onDelete(link.id) },
     ])
   }
 
@@ -69,7 +71,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
     if (saving) return
     const trimmed = draft.trim()
     if (!trimmed) {
-      setEditError("El título no puede estar vacío.")
+      setEditError(t("titleEmpty"))
       return
     }
     if (trimmed === link.title) {
@@ -82,7 +84,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
       await onEditTitle(link.id, trimmed)
       setEditing(false)
     } catch {
-      setEditError("No se pudo guardar el título.")
+      setEditError(t("titleSaveFailed"))
     } finally {
       setSaving(false)
     }
@@ -94,8 +96,8 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
       <View style={styles.content}>
         <View style={styles.topRow}>
           {isLatest ? (
-            <Text style={styles.latestBadge} accessibilityLabel="Último enlace añadido">
-              NUEVO
+            <Text style={styles.latestBadge} accessibilityLabel={t("latestLinkAccessibility")}>
+              {t("newBadge")}
             </Text>
           ) : null}
           {editing ? (
@@ -108,7 +110,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                 editable={!saving}
                 onSubmitEditing={saveEditing}
                 returnKeyType="done"
-                accessibilityLabel="Editar título del enlace"
+                accessibilityLabel={t("editLinkTitleAccessibility")}
               />
               {editError ? (
                 <Text style={styles.editError}>{editError}</Text>
@@ -125,7 +127,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
           <View style={styles.metaRow}>
             <Text style={styles.platform}>{PLATFORM_LABELS[link.platform]}</Text>
             <Text style={styles.dot}>·</Text>
-            <Text style={styles.date}>{formatTimestamp(link.createdAt)}</Text>
+            <Text style={styles.date}>{formatTimestamp(link.createdAt, language)}</Text>
           </View>
 
           <View style={styles.actions}>
@@ -138,7 +140,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                     styles.iconBtn,
                     pressed && styles.pressed,
                   ]}
-                  accessibilityLabel="Guardar título"
+                  accessibilityLabel={t("saveTitleAccessibility")}
                 >
                   <Text style={styles.iconSave}>✓</Text>
                 </Pressable>
@@ -150,7 +152,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                     styles.iconBtn,
                     pressed && styles.pressed,
                   ]}
-                  accessibilityLabel="Cancelar edición"
+                  accessibilityLabel={t("cancelEditAccessibility")}
                 >
                   <Text style={styles.iconCancel}>×</Text>
                 </Pressable>
@@ -163,7 +165,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                     styles.iconBtn,
                     pressed && styles.pressed,
                   ]}
-                  accessibilityLabel="Abrir enlace"
+                  accessibilityLabel={t("openLinkAccessibility")}
                 >
                   <Text style={styles.iconOpen}>↗</Text>
                 </Pressable>
@@ -174,7 +176,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                     styles.iconBtn,
                     pressed && styles.pressed,
                   ]}
-                  accessibilityLabel="Editar título"
+                  accessibilityLabel={t("editTitleAccessibility")}
                 >
                   <Text style={styles.iconEdit}>✎</Text>
                 </Pressable>
@@ -185,7 +187,7 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                     styles.iconBtn,
                     pressed && styles.pressed,
                   ]}
-                  accessibilityLabel="Eliminar enlace"
+                  accessibilityLabel={t("deleteLinkAccessibility")}
                 >
                   <Text style={styles.iconDelete}>×</Text>
                 </Pressable>

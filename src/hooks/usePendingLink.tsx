@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import type { AppLanguage } from "../i18n/translations"
 import { processAndSaveLink } from "../services/linkProcessingService"
 import { AppError, getErrorMessage } from "../utils/errors"
 
@@ -12,7 +13,7 @@ type PendingLinkContextValue = {
   messageType: BannerType
   setPendingUrl: (url: string) => Promise<void>
   clearPendingUrl: () => Promise<void>
-  processPendingUrl: (userId: string) => Promise<void>
+  processPendingUrl: (userId: string, lang?: AppLanguage) => Promise<void>
   showMessage: (message: string, type?: BannerType) => void
   dismissMessage: () => void
 }
@@ -62,23 +63,24 @@ export function PendingLinkProvider({ children }: { children: ReactNode }) {
     setMessage(null)
   }
 
-  const processPendingUrl = async (userId: string) => {
+  const processPendingUrl = async (userId: string, lang: AppLanguage = "es") => {
     if (!pendingUrl || processing) return
     setProcessing(true)
     try {
-      const result = await processAndSaveLink(pendingUrl, userId)
+      const result = await processAndSaveLink(pendingUrl, userId, lang)
       await clearPendingUrl()
       if (result.warnings.length > 0) {
-        showMessage(`Enlace guardado. ${result.warnings.join(" ")}`, "success")
+        const prefix = lang === "en" ? "Link saved." : "Enlace guardado."
+        showMessage(`${prefix} ${result.warnings.join(" ")}`, "success")
       } else {
-        showMessage("Enlace guardado", "success")
+        showMessage(lang === "en" ? "Link saved" : "Enlace guardado", "success")
       }
     } catch (error) {
       console.warn("[PendingLink] Process error:", error)
       if (error instanceof AppError && error.code === "INVALID_URL") {
         await clearPendingUrl()
       }
-      showMessage(getErrorMessage(error), "error")
+      showMessage(getErrorMessage(error, lang), "error")
     } finally {
       setProcessing(false)
     }

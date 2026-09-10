@@ -2,11 +2,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useState } from "react"
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native"
 import { Button } from "../components/Button"
+import { LanguageSelector } from "../components/LanguageSelector"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
 import { layout } from "../constants/layout"
 import { useAuth } from "../hooks/useAuth"
+import { useLanguage } from "../hooks/useLanguage"
 import type { RootStackParamList } from "../navigation/types"
 import { getAuthErrorMessage } from "../utils/errors"
 
@@ -14,6 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Login">
 
 export function LoginScreen({ navigation }: Props) {
   const { signIn } = useAuth()
+  const { language, t } = useLanguage()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -24,7 +27,7 @@ export function LoginScreen({ navigation }: Props) {
     setError(null)
 
     if (!email.trim() || !password) {
-      setError("Introduce tu email y contraseña.")
+      setError(t("enterEmailPassword"))
       return
     }
 
@@ -32,7 +35,7 @@ export function LoginScreen({ navigation }: Props) {
     try {
       await signIn(email, password)
     } catch (signInError) {
-      setError(getAuthErrorMessage(signInError))
+      setError(getAuthErrorMessage(signInError, language))
     } finally {
       setLoading(false)
     }
@@ -46,37 +49,39 @@ export function LoginScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>para-despues</Text>
-            <Text style={styles.subtitle}>Guarda enlaces para leer después</Text>
+            <Text style={styles.title}>{t("appTagline")}</Text>
+            <Text style={styles.subtitle}>{t("loginSubtitle")}</Text>
           </View>
 
           <View style={styles.form}>
             <TextField
-              label="Email"
+              label={t("emailLabel")}
               value={email}
               onChangeText={setEmail}
-              placeholder="tu@ejemplo.com"
+              placeholder={t("emailPlaceholder")}
               keyboardType="email-address"
               autoCapitalize="none"
             />
             <TextField
-              label="Password"
+              label={t("passwordLabel")}
               value={password}
               onChangeText={setPassword}
-              placeholder="Tu contraseña"
+              placeholder={t("passwordPlaceholderLogin")}
               secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={handleLogin}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Button title="Iniciar sesión" onPress={handleLogin} loading={loading} />
+            <Button title={t("signIn")} onPress={handleLogin} loading={loading} />
           </View>
 
           <Button
-            title="Crear una cuenta"
+            title={t("createAccount")}
             onPress={() => navigation.navigate("Register")}
             variant="secondary"
           />
+
+          <LanguageSelector compact />
         </View>
       </KeyboardAvoidingView>
     </Screen>

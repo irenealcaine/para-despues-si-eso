@@ -14,8 +14,10 @@ import { EmptyState } from "../components/EmptyState"
 import { SaveIcon, SettingsIcon } from "../components/Icon"
 import { LinkCard } from "../components/LinkCard"
 import { Screen } from "../components/Screen"
+import { getCategoryLabel, getDefaultCategory } from "../constants/categories"
 import { colors } from "../constants/colors"
 import { useAuth } from "../hooks/useAuth"
+import { useLanguage } from "../hooks/useLanguage"
 import { useSavedLinks } from "../hooks/useSavedLinks"
 import { deleteLink, updateLinkTitle } from "../services/firestoreService"
 import type { RootStackParamList } from "../navigation/types"
@@ -30,6 +32,7 @@ type Section = {
 
 export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth()
+  const { language, t } = useLanguage()
   const userId = user?.uid ?? ""
   const { links, loading, error } = useSavedLinks(userId)
 
@@ -52,7 +55,8 @@ export function HomeScreen({ navigation }: Props) {
 
   const sections = useMemo(() => {    const grouped = new Map<string, SavedLink[]>()
     for (const link of links) {
-      const category = link.category ?? "Other"
+      const rawCategory = link.category ?? getDefaultCategory(language)
+      const category = getCategoryLabel(rawCategory, language)
       const existing = grouped.get(category)
       if (existing) {
         existing.push(link)
@@ -64,21 +68,26 @@ export function HomeScreen({ navigation }: Props) {
     for (const [title, data] of grouped) {
       result.push({ title, data })
     }
+    const defaultCategory = getDefaultCategory(language)
     result.sort((a, b) => {
-      if (a.title === "Otros") return 1
-      if (b.title === "Otros") return -1
-      return a.title.localeCompare(b.title)
+      if (a.title === defaultCategory) return 1
+      if (b.title === defaultCategory) return -1
+      return a.title.localeCompare(b.title, language === "en" ? "en" : "es")
     })
     return result
-  }, [links])
+  }, [links, language])
 
   return (
     <Screen>
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>Para después</Text>
-            <Text style={styles.count}>{links.length} guardados</Text>
+            <Text style={styles.title}>{t("appName")}</Text>
+            <Text style={styles.count}>
+              {links.length === 1
+                ? t("savedCount_one")
+                : t("savedCount_other", { count: links.length })}
+            </Text>
           </View>
           <View style={styles.headerActions}>
             <Pressable
@@ -87,7 +96,7 @@ export function HomeScreen({ navigation }: Props) {
                 styles.settingsBtn,
                 pressed && styles.settingsBtnPressed,
               ]}
-              accessibilityLabel="Ajustes"
+              accessibilityLabel={t("settingsAccessibility")}
             >
               <SettingsIcon size={20} color={colors.text} />
             </Pressable>
@@ -97,7 +106,7 @@ export function HomeScreen({ navigation }: Props) {
                 styles.addBtn,
                 pressed && styles.addBtnPressed,
               ]}
-              accessibilityLabel="Añadir enlace"
+              accessibilityLabel={t("addLinkAccessibility")}
             >
               <SaveIcon size={20} color={colors.text} />
             </Pressable>
@@ -110,12 +119,12 @@ export function HomeScreen({ navigation }: Props) {
           </View>
         ) : error ? (
           <View style={styles.center}>
-            <EmptyState title="No se pudieron cargar tus enlaces" subtitle={error} />
+            <EmptyState title={t("homeEmptyError")} subtitle={error} />
           </View>
         ) : sections.length === 0 ? (
           <EmptyState
-            title="No hay enlaces guardados"
-            subtitle="Comparte un enlace desde cualquier app para guardarlo aquí."
+            title={t("homeEmptyTitle")}
+            subtitle={t("homeEmptySubtitle")}
           />
         ) : (
           <SectionList

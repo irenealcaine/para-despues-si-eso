@@ -6,6 +6,7 @@ import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
 import { useAuth } from "../hooks/useAuth"
+import { useLanguage } from "../hooks/useLanguage"
 import type { RootStackParamList } from "../navigation/types"
 import { processAndSaveLink, type ProcessLinkResult } from "../services/linkProcessingService"
 import { AppError, getErrorMessage } from "../utils/errors"
@@ -14,6 +15,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "AddLink">
 
 export function AddLinkScreen({ navigation }: Props) {
   const { user } = useAuth()
+  const { language, t } = useLanguage()
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [needsApiKey, setNeedsApiKey] = useState(false)
@@ -28,19 +30,19 @@ export function AddLinkScreen({ navigation }: Props) {
     setNeedsApiKey(false)
 
     if (!url.trim()) {
-      setError("Introduce una URL.")
+      setError(t("enterUrl"))
       return
     }
 
     setSaving(true)
     try {
-      const result = await processAndSaveLink(url, user.uid)
+      const result = await processAndSaveLink(url, user.uid, language)
       setSaved(result)
       if (result.warnings.length > 0) {
         setWarning(result.warnings.join(" "))
       }
     } catch (saveError) {
-      setError(getErrorMessage(saveError))
+      setError(getErrorMessage(saveError, language))
       setNeedsApiKey(
         saveError instanceof AppError && saveError.code === "NO_API_KEY",
       )
@@ -53,10 +55,10 @@ export function AddLinkScreen({ navigation }: Props) {
     return (
       <Screen>
         <View style={styles.center}>
-          <Text style={styles.successTitle}>Enlace guardado</Text>
+          <Text style={styles.successTitle}>{t("linkSaved")}</Text>
           <Text style={styles.successSubtitle}>{saved.title}</Text>
           {warning ? <Text style={styles.warning}>{warning}</Text> : null}
-          <Button title="Volver al inicio" onPress={() => navigation.goBack()} />
+          <Button title={t("backToHome")} onPress={() => navigation.goBack()} />
         </View>
       </Screen>
     )
@@ -72,15 +74,15 @@ export function AddLinkScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Añadir enlace</Text>
+            <Text style={styles.title}>{t("addLinkTitle")}</Text>
             <Text style={styles.subtitle}>
-              Pega una URL de YouTube, Instagram o cualquier web.
+              {t("addLinkSubtitle")}
             </Text>
           </View>
 
           <View style={styles.form}>
             <TextField
-              label="URL"
+              label={t("urlLabel")}
               value={url}
               onChangeText={setUrl}
               placeholder="https://..."
@@ -93,7 +95,7 @@ export function AddLinkScreen({ navigation }: Props) {
                 <Text style={styles.error}>{error}</Text>
                 {isNoApiKeyError ? (
                   <Button
-                    title="Ir a Ajustes"
+                    title={t("goToSettings")}
                     onPress={() => navigation.navigate("Settings")}
                     variant="secondary"
                     compact
@@ -102,10 +104,10 @@ export function AddLinkScreen({ navigation }: Props) {
               </View>
             ) : null}
 
-            <Button title="Guardar" onPress={handleSave} loading={saving} />
+            <Button title={t("save")} onPress={handleSave} loading={saving} />
             {saving ? (
               <Text style={styles.processing}>
-                Detectando plataforma, obteniendo info...
+                {t("processingLink")}
               </Text>
             ) : null}
           </View>

@@ -1,7 +1,8 @@
 import {
-  DEFAULT_CATEGORY,
+  getDefaultCategory,
   type LinkCategory,
 } from "../constants/categories"
+import type { AppLanguage } from "../i18n/translations"
 import type { LinkType } from "../types/link"
 import { AppError } from "../utils/errors"
 import { isValidHttpUrl, normalizeUrl, titleFromUrl } from "../utils/url"
@@ -17,9 +18,31 @@ export type ProcessLinkResult = {
   warnings: string[]
 }
 
+const WARNINGS: Record<AppLanguage, Record<string, string>> = {
+  es: {
+    noMetadata: "Metadatos no disponibles.",
+    noExtraInfo: "No se pudo obtener información adicional de este enlace.",
+    aiFailed: "OpenAI no pudo procesar este enlace.",
+    aiNoDescription: "OpenAI no pudo describir este enlace. Se usó un título alternativo.",
+    aiProcessedFallback: "OpenAI no pudo procesar este enlace. Se usó un título alternativo.",
+    invalidApiKey: "La API key de OpenAI no es válida. Revísala en Ajustes.",
+    titleFromUrl: "Metadatos no disponibles. Se generó un título a partir de la URL.",
+  },
+  en: {
+    noMetadata: "Metadata unavailable.",
+    noExtraInfo: "Could not fetch additional info for this link.",
+    aiFailed: "OpenAI could not process this link.",
+    aiNoDescription: "OpenAI could not describe this link. A fallback title was used.",
+    aiProcessedFallback: "OpenAI could not process this link. A fallback title was used.",
+    invalidApiKey: "The OpenAI API key is not valid. Check it in Settings.",
+    titleFromUrl: "Metadata unavailable. A title was generated from the URL.",
+  },
+}
+
 export async function processAndSaveLink(
   rawUrl: string,
   userId: string,
+  lang: AppLanguage = "es",
 ): Promise<ProcessLinkResult> {
   console.log("[ProcessLink] Starting for:", rawUrl)
 
@@ -37,12 +60,12 @@ export async function processAndSaveLink(
 
   let metadata: UrlMetadata
   try {
-    metadata = await fetchMetadataBestEffort(url, warnings)
+    metadata = await fetchMetadataBestEffort(url, warnings, lang)
     console.log("[ProcessLink] Metadata OK, title:", metadata.title)
   } catch (err) {
     console.warn("[ProcessLink] Metadata failed:", err)
     metadata = { title: null, description: null, image: null, type: "unknown" }
-    warnings.push("Metadatos no disponibles.")
+    warnings.push(WARNINGS[lang].noMetadata)
   }
 
   let apiKey: string | null = null
@@ -60,18 +83,18 @@ export async function processAndSaveLink(
 
   let ai = { title: null as string | null, category: null as LinkCategory | null }
   try {
-    ai = await generateInfoBestEffort(apiKey, url, platform, metadata, warnings)
+    ai = await generateInfoBestEffort(apiKey, url, platform, metadata, warnings, lang)
     console.log("[ProcessLink] AI result:", ai)
   } catch (err) {
     console.warn("[ProcessLink] AI failed:", err)
-    warnings.push("OpenAI no pudo procesar este enlace.")
+    warnings.push(WARNINGS[lang].aiFailed)
   }
 
   const title = ai.title ?? metadata.title ?? titleFromUrl(url)
-  const category = ai.category ?? DEFAULT_CATEGORY
+  const category = ai.category ?? (getDefaultCategory(lang) as LinkCategory)
 
   if (!ai.title && !metadata.title) {
-    warnings.push("Metadatos no disponibles. Se generó un título a partir de la URL.")
+    warnings.push(WARNINGS[lang].titleFromUrl)
   }
 
   const type: LinkType =
@@ -100,12 +123,13 @@ export async function processAndSaveLink(
 async function fetchMetadataBestEffort(
   url: string,
   warnings: string[],
+  lang: AppLanguage = "es",
 ): Promise<UrlMetadata> {
   try {
     return await fetchUrlMetadata(url)
   } catch (err) {
     console.warn("[ProcessLink] fetchMetadata error:", err)
-    warnings.push("No se pudo obtener información adicional de este enlace.")
+    warnings.push(WARNINGS[lang].noExtraInfo)
     return { title: null, description: null, image: null, type: "unknown" }
   }
 }
@@ -116,19 +140,20 @@ async function generateInfoBestEffort(
   platform: string,
   metadata: UrlMetadata,
   warnings: string[],
+  lang: AppLanguage = "es",
 ) {
   try {
-    const ai = await generateLinkInfo(apiKey, { url, platform, metadata })
+    const ai = await generateLinkInfo(apiKey, { url, platform, metadata, language: lang })
     if (!ai) {
-      warnings.push("OpenAI no pudo describir este enlace. Se usó un título alternativo.")
+      warnings.push(WARNINGS[lang].aiNoDescription)
       return { title: null, category: null }
     }
     return { title: ai.title, category: ai.category }
   } catch (error) {
     if (error instanceof AppError && error.code === "INVALID_API_KEY") {
-      warnings.push("La API key de OpenAI no es válida. Revísala en Ajustes.")
+      warnings.push(WARNINGS[lang].invalidApiKey)
     } else {
-      warnings.push("OpenAI no pudo procesar este enlace. Se usó un título alternativo.")
+      warnings.push(WARNINGS[lang].aiProcessedFallback)
     }
     return { title: null, category: null }
   }

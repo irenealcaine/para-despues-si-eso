@@ -1,15 +1,16 @@
 import { ScrollView, StyleSheet, Text } from "react-native"
 import { Screen } from "./Screen"
 import { colors } from "../constants/colors"
+import { useLanguage } from "../hooks/useLanguage"
 
 export function ConfigError() {
+  const { t } = useLanguage()
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Configuración faltante</Text>
+        <Text style={styles.title}>{t("configMissingTitle")}</Text>
         <Text style={styles.body}>
-          Firebase no está configurado. Copia .env.example a .env y rellena los
-          valores de tu proyecto Firebase, luego reinicia la app.
+          {t("configMissingBody")}
         </Text>
       </ScrollView>
     </Screen>

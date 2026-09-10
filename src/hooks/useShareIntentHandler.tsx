@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react"
 import { useShareIntentContext } from "expo-share-intent"
 import { useAuth } from "./useAuth"
+import { useLanguage } from "./useLanguage"
 import { useOpenAIKey } from "./useOpenAIKey"
 import { usePendingLink } from "./usePendingLink"
 import { extractUrl } from "../utils/url"
@@ -11,6 +12,7 @@ export function ShareIntentHandler() {
   const { hasShareIntent, shareIntent, resetShareIntent } =
     useShareIntentContext()
   const { user } = useAuth()
+  const { language, t } = useLanguage()
   const { hasApiKey, initializing: keyInitializing } = useOpenAIKey()
   const autoAttemptedUrl = useRef<string | null>(null)
   const {
@@ -33,7 +35,7 @@ export function ShareIntentHandler() {
       const url = extractUrl(rawText)
 
       if (!url) {
-        showMessage("Contenido no compatible. Solo se guardan enlaces.", "error")
+        showMessage(t("shareIncompatible"), "error")
         resetShareIntent()
         return
       }
@@ -43,13 +45,13 @@ export function ShareIntentHandler() {
       resetShareIntent()
 
       if (!user) {
-        showMessage("Inicia sesión para guardar el enlace compartido.", "info")
+        showMessage(t("shareLoginRequired"), "info")
       } else if (!hasApiKey) {
-        showMessage("Configura tu API key de OpenAI para guardar este enlace.", "error")
+        showMessage(t("shareApiKeyRequired"), "error")
       }
     } catch (err) {
       console.warn("[ShareIntent] Error processing share intent:", err)
-      showMessage("Error al procesar el enlace compartido.", "error")
+      showMessage(t("shareProcessError"), "error")
       resetShareIntent()
     }
   }, [hasShareIntent, shareIntent, user, hasApiKey])
@@ -63,7 +65,7 @@ export function ShareIntentHandler() {
       !processing
     ) {
       autoAttemptedUrl.current = pendingUrl
-      processPendingUrl(user.uid).catch((err) => {
+      processPendingUrl(user.uid, language).catch((err) => {
         console.warn("[ShareIntent] Auto-process failed:", err)
       })
     }
@@ -71,7 +73,7 @@ export function ShareIntentHandler() {
 
   useEffect(() => {
     if (user && pendingUrl && !hasApiKey) {
-      showMessage("Configura tu API key de OpenAI para guardar este enlace.", "error")
+      showMessage(t("shareApiKeyRequired"), "error")
     }
   }, [user, pendingUrl, hasApiKey])
 
@@ -89,14 +91,14 @@ export function ShareIntentHandler() {
 
   return (
     <ShareBanner
-      message={message ?? "Guardando enlace..."}
+      message={message ?? t("shareSaving")}
       type={messageType}
       processing={banner.processing}
       onSettingsPress={user && !hasApiKey ? () => navigate("Settings") : undefined}
       onRetryPress={
         user && hasApiKey && pendingUrl && !keyInitializing
           ? () => {
-              processPendingUrl(user.uid).catch((err) => {
+              processPendingUrl(user.uid, language).catch((err) => {
                 console.warn("[ShareIntent] Retry failed:", err)
               })
             }

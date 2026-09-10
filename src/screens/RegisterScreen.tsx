@@ -2,11 +2,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { useState } from "react"
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native"
 import { Button } from "../components/Button"
+import { LanguageSelector } from "../components/LanguageSelector"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
 import { layout } from "../constants/layout"
 import { useAuth } from "../hooks/useAuth"
+import { useLanguage } from "../hooks/useLanguage"
 import type { RootStackParamList } from "../navigation/types"
 import { getAuthErrorMessage } from "../utils/errors"
 
@@ -14,6 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Register">
 
 export function RegisterScreen({ navigation }: Props) {
   const { signUp } = useAuth()
+  const { language, t } = useLanguage()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -25,12 +28,12 @@ export function RegisterScreen({ navigation }: Props) {
     setError(null)
 
     if (!email.trim() || !password || !confirmPassword) {
-      setError("Rellena todos los campos.")
+      setError(t("fillAllFields"))
       return
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.")
+      setError(t("passwordsDontMatch"))
       return
     }
 
@@ -38,7 +41,7 @@ export function RegisterScreen({ navigation }: Props) {
     try {
       await signUp(email, password)
     } catch (signUpError) {
-      setError(getAuthErrorMessage(signUpError))
+      setError(getAuthErrorMessage(signUpError, language))
     } finally {
       setLoading(false)
     }
@@ -52,44 +55,46 @@ export function RegisterScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Crear cuenta</Text>
+            <Text style={styles.title}>{t("registerTitle")}</Text>
           </View>
 
           <View style={styles.form}>
             <TextField
-              label="Email"
+              label={t("emailLabel")}
               value={email}
               onChangeText={setEmail}
-              placeholder="tu@ejemplo.com"
+              placeholder={t("emailPlaceholder")}
               keyboardType="email-address"
               autoCapitalize="none"
             />
             <TextField
-              label="Password"
+              label={t("passwordLabel")}
               value={password}
               onChangeText={setPassword}
-              placeholder="Mínimo 6 caracteres"
+              placeholder={t("passwordPlaceholderRegister")}
               secureTextEntry
               autoCapitalize="none"
             />
             <TextField
-              label="Confirmar contraseña"
+              label={t("confirmPasswordLabel")}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              placeholder="Repite tu contraseña"
+              placeholder={t("confirmPasswordPlaceholder")}
               secureTextEntry
               autoCapitalize="none"
               onSubmitEditing={handleRegister}
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Button title="Registrarse" onPress={handleRegister} loading={loading} />
+            <Button title={t("signUp")} onPress={handleRegister} loading={loading} />
           </View>
 
           <Button
-            title="Ya tengo una cuenta"
+            title={t("alreadyHaveAccount")}
             onPress={() => navigation.navigate("Login")}
             variant="secondary"
           />
+
+          <LanguageSelector compact />
         </View>
       </KeyboardAvoidingView>
     </Screen>

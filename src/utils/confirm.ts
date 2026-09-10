@@ -10,6 +10,7 @@ export function confirmDestructive(
   message: string,
   confirmLabel: string,
   onConfirm: () => void,
+  cancelLabel = "Cancelar",
 ): void {
   if (Platform.OS === "web") {
     if (typeof window !== "undefined" && window.confirm(`${title}\n\n${message}`)) {
@@ -19,7 +20,7 @@ export function confirmDestructive(
   }
 
   Alert.alert(title, message, [
-    { text: "Cancelar", style: "cancel" },
+    { text: cancelLabel, style: "cancel" },
     { text: confirmLabel, style: "destructive", onPress: onConfirm },
   ])
 }

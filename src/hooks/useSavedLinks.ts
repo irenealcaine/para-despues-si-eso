@@ -2,8 +2,10 @@ import { useEffect, useState } from "react"
 import { subscribeToLinks } from "../services/firestoreService"
 import type { SavedLink } from "../types/link"
 import { getErrorMessage } from "../utils/errors"
+import { useLanguage } from "./useLanguage"
 
 export function useSavedLinks(userId: string) {
+  const { language } = useLanguage()
   const [links, setLinks] = useState<SavedLink[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -24,12 +26,12 @@ export function useSavedLinks(userId: string) {
         setLoading(false)
       },
       (loadError) => {
-        setError(getErrorMessage(loadError))
+        setError(getErrorMessage(loadError, language))
         setLoading(false)
       },
     )
     return unsubscribe
-  }, [userId])
+  }, [userId, language])
 
   return { links, loading, error }
 }

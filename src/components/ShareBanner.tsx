@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { colors } from "../constants/colors"
+import { useLanguage } from "../hooks/useLanguage"
 import type { BannerType } from "../hooks/usePendingLink"
 import { Button } from "./Button"
 
@@ -21,6 +22,7 @@ export function ShareBanner({
   onRetryPress,
   onDismiss,
 }: ShareBannerProps) {
+  const { t } = useLanguage()
   const insets = useSafeAreaInsets()
   const bannerColor =
     type === "error" ? colors.danger : type === "success" ? colors.success : colors.accent
@@ -42,7 +44,7 @@ export function ShareBanner({
         <View style={styles.actions}>
           {onSettingsPress ? (
             <Button
-              title="Ajustes"
+              title={t("settings")}
               onPress={onSettingsPress}
               variant="secondary"
               compact
@@ -50,14 +52,14 @@ export function ShareBanner({
           ) : null}
           {onRetryPress && !processing ? (
             <Button
-              title="Reintentar"
+              title={t("retry")}
               onPress={onRetryPress}
               variant="secondary"
               compact
             />
           ) : null}
           {!processing ? (
-            <Button title="Cerrar" onPress={onDismiss} variant="ghost" compact />
+            <Button title={t("close")} onPress={onDismiss} variant="ghost" compact />
           ) : null}
         </View>
       </View>

@@ -1,9 +1,10 @@
 import {
-  CATEGORIES,
-  DEFAULT_CATEGORY,
+  getCategories,
+  getDefaultCategory,
   isCategory,
   type LinkCategory,
 } from "../constants/categories"
+import type { AppLanguage } from "../i18n/translations"
 import { AppError } from "../utils/errors"
 import type { UrlMetadata } from "./urlMetadataService"
 
@@ -16,17 +17,23 @@ type OpenAiInput = {
   url: string
   platform: string
   metadata: UrlMetadata
+  language?: AppLanguage
 }
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 const MODEL = "gpt-4o-mini"
 const MAX_TITLE_LENGTH = 120
 
-const SYSTEM_PROMPT = `You extract minimal information from a saved link.
+function buildSystemPrompt(lang: AppLanguage = "es"): string {
+  const categories = getCategories(lang).join(", ")
+  const fallbackLang = lang === "en" ? "English" : "Spanish"
+  const fallbackCategory = getDefaultCategory(lang)
+  return `You extract minimal information from a saved link.
 Return ONLY a JSON object with these two keys:
-- "title": a short, descriptive title of the content (max 10 words). Use the language of the available content when it can be detected, otherwise Spanish. Never invent content.
-- "category": exactly one of these categories: ${CATEGORIES.join(", ")}.
-Choose the single best matching category. Never create a new category. If nothing fits, use "Otros".`
+- "title": a short, descriptive title of the content (max 10 words). Use the language of the available content when it can be detected, otherwise ${fallbackLang}. Never invent content.
+- "category": exactly one of these categories: ${categories}.
+Choose the single best matching category. Never create a new category. If nothing fits, use "${fallbackCategory}".`
+}
 
 export async function validateApiKey(apiKey: string): Promise<void> {
   let response: Response
@@ -59,12 +66,13 @@ export async function generateLinkInfo(
   apiKey: string,
   input: OpenAiInput,
 ): Promise<AiLinkInfo | null> {
+  const lang = input.language ?? "es"
   const body = {
     model: MODEL,
     temperature: 0.3,
     response_format: { type: "json_object" },
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: buildSystemPrompt(lang) },
       {
         role: "user",
         content: JSON.stringify({
@@ -116,8 +124,8 @@ export async function generateLinkInfo(
       typeof parsed.title === "string" ? parsed.title.trim().slice(0, MAX_TITLE_LENGTH) : ""
     const category =
       typeof parsed.category === "string" && isCategory(parsed.category)
-        ? parsed.category
-        : DEFAULT_CATEGORY
+        ? (parsed.category as LinkCategory)
+        : (getDefaultCategory(lang) as LinkCategory)
 
     if (title.length === 0) return null
     return { title, category }

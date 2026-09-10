@@ -3,11 +3,13 @@ import { useState } from "react"
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
 import { AppFooter } from "../components/AppFooter"
 import { Button } from "../components/Button"
+import { LanguageSelector } from "../components/LanguageSelector"
 import { Screen } from "../components/Screen"
 import { TextField } from "../components/TextField"
 import { colors } from "../constants/colors"
 import { layout } from "../constants/layout"
 import { useAuth } from "../hooks/useAuth"
+import { useLanguage } from "../hooks/useLanguage"
 import { useOpenAIKey } from "../hooks/useOpenAIKey"
 import type { RootStackParamList } from "../navigation/types"
 import { confirmDestructive } from "../utils/confirm"
@@ -17,6 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, "Settings">
 
 export function SettingsScreen({ navigation }: Props) {
   const { user, signOut } = useAuth()
+  const { language, t } = useLanguage()
   const { hasApiKey, keyHint, initializing, saveKey, deleteKey } = useOpenAIKey()
   const [apiKeyInput, setApiKeyInput] = useState("")
   const [saving, setSaving] = useState(false)
@@ -27,7 +30,7 @@ export function SettingsScreen({ navigation }: Props) {
     setError(null)
 
     if (!apiKeyInput.trim()) {
-      setError("Introduce tu API key de OpenAI.")
+      setError(t("enterApiKey"))
       return
     }
 
@@ -36,7 +39,7 @@ export function SettingsScreen({ navigation }: Props) {
       await saveKey(apiKeyInput)
       setApiKeyInput("")
     } catch (saveError) {
-      setError(getErrorMessage(saveError))
+      setError(getErrorMessage(saveError, language))
     } finally {
       setSaving(false)
     }
@@ -44,19 +47,21 @@ export function SettingsScreen({ navigation }: Props) {
 
   const handleDeleteKey = () => {
     confirmDestructive(
-      "Eliminar API key",
-      "Tu API key de OpenAI se eliminará de este dispositivo. ¿Continuar?",
-      "Eliminar",
+      t("deleteApiKeyTitle"),
+      t("deleteApiKeyMessage"),
+      t("delete"),
       () => deleteKey(),
+      t("cancel"),
     )
   }
 
   const handleLogout = () => {
     confirmDestructive(
-      "Cerrar sesión",
-      "Tendrás que iniciar sesión de nuevo para ver tus enlaces.",
-      "Cerrar sesión",
+      t("logoutTitle"),
+      t("logoutMessage"),
+      t("logout"),
       () => signOut(),
+      t("cancel"),
     )
   }
 
@@ -69,19 +74,19 @@ export function SettingsScreen({ navigation }: Props) {
             style={({ pressed }) => [styles.backBtn, pressed && styles.backPressed]}
           >
             <Text style={styles.backIcon}>←</Text>
-            <Text style={styles.backLabel}>Volver</Text>
+            <Text style={styles.backLabel}>{t("back")}</Text>
           </Pressable>
-          <Text style={styles.title}>Ajustes</Text>
+          <Text style={styles.title}>{t("settings")}</Text>
         </View>
 
         <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Cuenta</Text>
+            <Text style={styles.sectionTitle}>{t("account")}</Text>
           </View>
 
           <View style={styles.statusCard}>
-            <Text style={styles.accountEmail}>{user?.email ?? "Sesión no disponible"}</Text>
+            <Text style={styles.accountEmail}>{user?.email ?? t("sessionUnavailable")}</Text>
           </View>
         </View>
 
@@ -89,7 +94,16 @@ export function SettingsScreen({ navigation }: Props) {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>API key de OpenAI</Text>
+            <Text style={styles.sectionTitle}>{t("language")}</Text>
+          </View>
+          <LanguageSelector compact />
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>{t("openaiApiKey")}</Text>
           </View>
 
           <View style={styles.statusCard}>
@@ -106,10 +120,10 @@ export function SettingsScreen({ navigation }: Props) {
               />
               <Text style={styles.statusText}>
                 {initializing
-                  ? "Comprobando..."
+                  ? t("checking")
                   : hasApiKey
-                    ? "Configurada"
-                    : "No configurada"}
+                    ? t("configured")
+                    : t("notConfigured")}
               </Text>
             </View>
             {hasApiKey && keyHint ? (
@@ -118,7 +132,7 @@ export function SettingsScreen({ navigation }: Props) {
           </View>
 
           <TextField
-            label="API key"
+            label={t("apiKeyLabel")}
             value={apiKeyInput}
             onChangeText={setApiKeyInput}
             placeholder="sk-..."
@@ -129,9 +143,9 @@ export function SettingsScreen({ navigation }: Props) {
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <View style={styles.row}>
-            <Button title="Guardar key" onPress={handleSaveKey} loading={saving} compact />
+            <Button title={t("saveKey")} onPress={handleSaveKey} loading={saving} compact />
             {hasApiKey ? (
-              <Button title="Eliminar key" onPress={handleDeleteKey} variant="danger" compact />
+              <Button title={t("deleteKey")} onPress={handleDeleteKey} variant="danger" compact />
             ) : null}
           </View>
         </View>
@@ -139,7 +153,7 @@ export function SettingsScreen({ navigation }: Props) {
         <View style={styles.divider} />
 
         <View style={styles.section}>
-          <Button title="Cerrar sesión" onPress={handleLogout} variant="danger" compact />
+          <Button title={t("logout")} onPress={handleLogout} variant="danger" compact />
         </View>
 
         <AppFooter />
