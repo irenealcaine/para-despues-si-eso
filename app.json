@@ -24,7 +24,13 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Para después — Guarda y clasifica tus enlaces",
+      "shortName": "Para después",
+      "lang": "es",
+      "description": "Guarda enlaces de YouTube, Instagram y más para verlos después. Clasifícalos automáticamente con IA y guárdalos de forma segura en tu cuenta.",
+      "themeColor": "#090B0E",
+      "backgroundColor": "#090B0E"
     },
     "plugins": [
       "expo-secure-store",

@@ -187,10 +187,10 @@ eas init                      # links the project and writes extra.eas.projectId
 eas env:set --name EXPO_PUBLIC_FIREBASE_API_KEY --value <value> \
   --environment preview production development --non-interactive
 # ...repeat for the other 6 EXPO_PUBLIC_FIREBASE_* variables
-eas build --platform android --profile preview
+pnpm apk
 ```
 
-`preview` builds an installable APK (`eas.json` sets `android.buildType: "apk"`). For Play Store you would use `--profile production` (AAB). EAS Build does not require a local Android SDK.
+`pnpm apk` runs `npx eas-cli@latest build --platform android --profile preview --non-interactive`. `preview` builds an installable APK (`eas.json` sets `android.buildType: "apk"`). For Play Store you would use `--profile production` (AAB). EAS Build does not require a local Android SDK.
 
 ## Project structure
 
