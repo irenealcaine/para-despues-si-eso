@@ -41,21 +41,18 @@ export function getFirebaseApp(): FirebaseApp {
 
 export function getAuthInstance(): Auth {
   if (auth) return auth
+  const appInstance = getFirebaseApp()
+  const persistence =
+    Platform.OS === "web"
+      ? browserLocalPersistence
+      : getReactNativePersistence(AsyncStorage)
   try {
-    // Si ya existe (HMR en web), reutilizar en vez de reventar.
-    auth = getAuth(getFirebaseApp())
-    return auth
+    // Inicializar con la persistencia adecuada desde el primer arranque
+    // para que la sesión sobreviva al reinicio de la app.
+    auth = initializeAuth(appInstance, { persistence })
   } catch {
-    // No hay instancia todavía: crearla con la persistencia adecuada.
-  }
-  if (Platform.OS === "web") {
-    auth = initializeAuth(getFirebaseApp(), {
-      persistence: browserLocalPersistence,
-    })
-  } else {
-    auth = initializeAuth(getFirebaseApp(), {
-      persistence: getReactNativePersistence(AsyncStorage),
-    })
+    // Ya existe una instancia (HMR en web): reutilizarla.
+    auth = getAuth(appInstance)
   }
   return auth
 }
