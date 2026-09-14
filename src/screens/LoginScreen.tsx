@@ -49,7 +49,9 @@ export function LoginScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>{t("appTagline")}</Text>
+            <Text style={styles.title} accessibilityRole="header">
+              {t("appTagline")}
+            </Text>
             <Text style={styles.subtitle}>{t("loginSubtitle")}</Text>
           </View>
 
@@ -71,7 +73,11 @@ export function LoginScreen({ navigation }: Props) {
               autoCapitalize="none"
               onSubmitEditing={handleLogin}
             />
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+            {error ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {error}
+              </Text>
+            ) : null}
             <Button title={t("signIn")} onPress={handleLogin} loading={loading} />
           </View>
 

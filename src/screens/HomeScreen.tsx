@@ -82,7 +82,9 @@ export function HomeScreen({ navigation }: Props) {
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>{t("appName")}</Text>
+            <Text style={styles.title} accessibilityRole="header">
+              {t("appName")}
+            </Text>
             <Text style={styles.count}>
               {links.length === 1
                 ? t("savedCount_one")
@@ -108,7 +110,7 @@ export function HomeScreen({ navigation }: Props) {
               ]}
               accessibilityLabel={t("addLinkAccessibility")}
             >
-              <SaveIcon size={20} color={colors.text} />
+              <SaveIcon size={20} color={colors.onAccent} />
             </Pressable>
           </View>
         </View>

@@ -26,6 +26,7 @@ export function Button({
   compact = false,
 }: ButtonProps) {
   const isDisabled = disabled || loading
+  const labelColor = labelColors[variant]
 
   return (
     <Pressable
@@ -40,9 +41,9 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={colors.text} size="small" />
+        <ActivityIndicator color={labelColor} size="small" />
       ) : (
-        <Text style={[styles.label, compact && styles.labelCompact]}>
+        <Text style={[styles.label, compact && styles.labelCompact, { color: labelColor }]}>
           {title}
         </Text>
       )}
@@ -63,7 +64,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   label: {
-    color: colors.text,
     fontSize: 15,
     fontWeight: "500",
     letterSpacing: 0.2,
@@ -95,6 +95,13 @@ const variantStyles = StyleSheet.create({
     backgroundColor: "transparent",
   },
 })
+
+const labelColors: Record<NonNullable<ButtonProps["variant"]>, string> = {
+  primary: colors.onAccent,
+  secondary: colors.text,
+  danger: colors.onAccent,
+  ghost: colors.text,
+}
 
 export function ButtonGroup({ children }: { children: ReactNode }) {
   return <View style={groupStyles.group}>{children}</View>

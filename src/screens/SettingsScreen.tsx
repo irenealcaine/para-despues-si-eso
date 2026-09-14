@@ -76,7 +76,7 @@ export function SettingsScreen({ navigation }: Props) {
             <Text style={styles.backIcon}>←</Text>
             <Text style={styles.backLabel}>{t("back")}</Text>
           </Pressable>
-          <Text style={styles.title}>{t("settings")}</Text>
+          <Text style={styles.title} accessibilityRole="header">{t("settings")}</Text>
         </View>
 
         <ScrollView contentContainerStyle={styles.container}>
@@ -140,7 +140,11 @@ export function SettingsScreen({ navigation }: Props) {
             autoCapitalize="none"
           />
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <Text style={styles.error} accessibilityRole="alert">
+              {error}
+            </Text>
+          ) : null}
 
           <View style={styles.row}>
             <Button title={t("saveKey")} onPress={handleSaveKey} loading={saving} compact />

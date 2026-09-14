@@ -5,10 +5,11 @@ export const colors = {
   border: "#1E222A",
   borderFocus: "#2A3040",
   text: "#D4D8DE",
-  textMuted: "#5C6370",
+  textMuted: "#8C93A0",
   accent: "#7B93C4",
   accentPressed: "#6A82B3",
-  danger: "#BF4E4E",
+  onAccent: "#10141B",
+  danger: "#CC6A6A",
   success: "#4A8C5C",
   warning: "#C49A4E",
 } as const

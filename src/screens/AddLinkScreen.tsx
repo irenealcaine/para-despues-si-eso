@@ -57,7 +57,11 @@ export function AddLinkScreen({ navigation }: Props) {
         <View style={styles.center}>
           <Text style={styles.successTitle}>{t("linkSaved")}</Text>
           <Text style={styles.successSubtitle}>{saved.title}</Text>
-          {warning ? <Text style={styles.warning}>{warning}</Text> : null}
+          {warning ? (
+            <Text style={styles.warning} accessibilityRole="alert">
+              {warning}
+            </Text>
+          ) : null}
           <Button title={t("backToHome")} onPress={() => navigation.goBack()} />
         </View>
       </Screen>
@@ -74,7 +78,9 @@ export function AddLinkScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>{t("addLinkTitle")}</Text>
+            <Text style={styles.title} accessibilityRole="header">
+              {t("addLinkTitle")}
+            </Text>
             <Text style={styles.subtitle}>
               {t("addLinkSubtitle")}
             </Text>
@@ -92,7 +98,9 @@ export function AddLinkScreen({ navigation }: Props) {
 
             {error ? (
               <View style={styles.errorBox}>
-                <Text style={styles.error}>{error}</Text>
+                <Text style={styles.error} accessibilityRole="alert">
+                  {error}
+                </Text>
                 {isNoApiKeyError ? (
                   <Button
                     title={t("goToSettings")}

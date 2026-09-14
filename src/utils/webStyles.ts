@@ -18,6 +18,10 @@ export function injectWebStyles(): void {
       scrollbar-width: thin;
       scrollbar-color: ${colors.borderFocus} transparent;
     }
+    :focus-visible {
+      outline: 2px solid ${colors.accent};
+      outline-offset: 2px;
+    }
     *::-webkit-scrollbar {
       width: 10px;
       height: 10px;

@@ -44,8 +44,13 @@ export function TextField({
         autoCorrect={false}
         keyboardType={keyboardType}
         onSubmitEditing={onSubmitEditing}
+        accessibilityLabel={label}
       />
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text style={styles.errorText} accessibilityRole="alert">
+          {error}
+        </Text>
+      ) : null}
     </View>
   )
 }

@@ -55,7 +55,9 @@ export function RegisterScreen({ navigation }: Props) {
       >
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>{t("registerTitle")}</Text>
+            <Text style={styles.title} accessibilityRole="header">
+              {t("registerTitle")}
+            </Text>
           </View>
 
           <View style={styles.form}>
@@ -84,7 +86,11 @@ export function RegisterScreen({ navigation }: Props) {
               autoCapitalize="none"
               onSubmitEditing={handleRegister}
             />
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+            {error ? (
+              <Text style={styles.error} accessibilityRole="alert">
+                {error}
+              </Text>
+            ) : null}
             <Button title={t("signUp")} onPress={handleRegister} loading={loading} />
           </View>
 

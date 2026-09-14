@@ -113,7 +113,9 @@ export function LinkCard({ link, onDelete, onEditTitle, isLatest = false }: Prop
                 accessibilityLabel={t("editLinkTitleAccessibility")}
               />
               {editError ? (
-                <Text style={styles.editError}>{editError}</Text>
+                <Text style={styles.editError} accessibilityRole="alert">
+                  {editError}
+                </Text>
               ) : null}
             </View>
           ) : (
